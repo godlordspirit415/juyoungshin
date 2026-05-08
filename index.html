@@ -1888,6 +1888,9 @@
 
     .cheer-up-btn {
       border: none;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
       border-radius: 26px;
       min-height: 128px;
       background:
@@ -2708,7 +2711,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    import { getDatabase, ref, onValue, set, update, remove, runTransaction, increment } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBQZC_ekFU1nD0K7ERJdEhEU3xpjLBgiBI",
@@ -2740,6 +2743,12 @@
     const DEFAULT_GAUGE_OPTIONS = ["신학과", "기독교상담학과", "사회복지선교학과", "기독교교육과미디어학과", "AIGS"];
     let isAdminUnlocked = sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "true";
     let lastGaugeBoostAt = 0;
+    const GAUGE_BOOST_THROTTLE_MS = 95;
+    const GAUGE_BOOST_FLUSH_MS = 320;
+    const pendingGaugeBoosts = {};
+    let gaugeBoostFlushTimer = null;
+    let renderAllScheduled = false;
+    let lastRenderAllAt = 0;
 
     const bannedWords = [
       "욕설",
@@ -2771,6 +2780,62 @@
     function dbPath(path = "") {
       const cleanPath = String(path || "").replace(/^\/+|\/+$/g, "");
       return ref(realtimeDb, cleanPath ? `${FIREBASE_ROOT}/${cleanPath}` : FIREBASE_ROOT);
+    }
+
+
+    function scheduleRenderAll(minDelay = 80) {
+      const now = Date.now();
+      const interval = Math.max(60, minDelay);
+      const delay = Math.max(0, interval - (now - lastRenderAllAt));
+      if (renderAllScheduled) return;
+      renderAllScheduled = true;
+      setTimeout(() => {
+        renderAllScheduled = false;
+        lastRenderAllAt = Date.now();
+        renderAll();
+      }, delay);
+    }
+
+    function addLocalGaugeBoost(battleId, optionKey, amount) {
+      const boosts = firebaseReady ? (firebaseState.gaugeBoosts || {}) : getGaugeBoosts();
+      boosts[battleId] = boosts[battleId] || {};
+      boosts[battleId][optionKey] = Number(boosts[battleId][optionKey] || 0) + amount;
+      if (firebaseReady) {
+        firebaseState.gaugeBoosts = boosts;
+      } else {
+        localStorage.setItem(GAUGE_BOOSTS_KEY, JSON.stringify(boosts));
+      }
+    }
+
+    function queueGaugeBoost(battleId, optionKey, amount = 1) {
+      if (!battleId || !optionKey) return;
+      pendingGaugeBoosts[battleId] = pendingGaugeBoosts[battleId] || {};
+      pendingGaugeBoosts[battleId][optionKey] = Number(pendingGaugeBoosts[battleId][optionKey] || 0) + amount;
+
+      if (gaugeBoostFlushTimer) return;
+      gaugeBoostFlushTimer = setTimeout(flushGaugeBoosts, GAUGE_BOOST_FLUSH_MS);
+    }
+
+    function flushGaugeBoosts() {
+      if (gaugeBoostFlushTimer) {
+        clearTimeout(gaugeBoostFlushTimer);
+        gaugeBoostFlushTimer = null;
+      }
+
+      const updates = {};
+      Object.entries(pendingGaugeBoosts).forEach(([battleId, optionMap]) => {
+        Object.entries(optionMap || {}).forEach(([optionKey, amount]) => {
+          const boostAmount = Number(amount || 0);
+          if (boostAmount > 0) updates[`gaugeBoosts/${battleId}/${optionKey}`] = increment(boostAmount);
+        });
+      });
+
+      Object.keys(pendingGaugeBoosts).forEach(battleId => delete pendingGaugeBoosts[battleId]);
+      if (!Object.keys(updates).length) return;
+
+      patchFirebase("", updates).catch(error => {
+        console.error("게이지 BOOST 일괄 저장 오류", error);
+      });
     }
 
     function arrayToFirebaseCollection(items) {
@@ -3898,11 +3963,11 @@
     }
 
     function cheerUpGaugeBattle(battleId) {
-      const battle = getGaugeBattles().find(item => item.id === battleId);
+      const battle = getGaugeBattles().find(item => String(item.id) === String(battleId));
       if (!battle || battle.status !== "active" || new Date(battle.endAt).getTime() <= Date.now()) {
         alert("이미 종료된 게이지 배틀입니다.");
         checkGaugeBattleExpiration();
-        renderAll();
+        scheduleRenderAll(60);
         return;
       }
 
@@ -3913,24 +3978,17 @@
       }
 
       const now = Date.now();
-      if (now - lastGaugeBoostAt < 180) return;
+      if (now - lastGaugeBoostAt < GAUGE_BOOST_THROTTLE_MS) return;
       lastGaugeBoostAt = now;
 
-      const boosts = getGaugeBoosts();
       const safeDepartmentKey = toFirebaseSafeKey(department);
-      boosts[battleId] = boosts[battleId] || {};
-      boosts[battleId][safeDepartmentKey] = Number(boosts[battleId][safeDepartmentKey] || boosts[battleId][department] || 0) + 1;
+      addLocalGaugeBoost(String(battleId), safeDepartmentKey, 1);
 
       if (firebaseReady) {
-        firebaseState.gaugeBoosts = boosts;
-        runTransaction(dbPath(`gaugeBoosts/${battleId}/${safeDepartmentKey}`), currentValue => Number(currentValue || 0) + 1)
-          .catch(error => {
-            console.error("게이지 BOOST 저장 오류", error);
-            alert("BOOST 저장 중 문제가 발생했습니다. 인터넷 연결을 확인해주세요.");
-          });
-        renderAll();
+        queueGaugeBoost(String(battleId), safeDepartmentKey, 1);
+        scheduleRenderAll(70);
       } else {
-        saveGaugeBoosts(boosts);
+        scheduleRenderAll(70);
       }
     }
 
@@ -3969,7 +4027,7 @@
                 <strong>${escapeHtml(choice)}</strong>
                 <button class="gauge-change-btn" onclick="clearGaugeChoice(${activeBattle.id})">항목 다시 선택하기</button>
               </div>
-              <button class="cheer-up-btn" onclick="cheerUpGaugeBattle(${activeBattle.id})">CHEER-UP!</button>
+              <button class="cheer-up-btn" onpointerdown="cheerUpGaugeBattle(${activeBattle.id})">CHEER-UP!</button>
             </div>
             <div class="gauge-mini-results">${renderGaugeMiniRows(activeBattle)}</div>
           ` : `
@@ -4366,13 +4424,19 @@
       }
     });
 
+
+    window.addEventListener("pagehide", flushGaugeBoosts);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") flushGaugeBoosts();
+    });
+
     function setupFirebaseRealtimeSync() {
       onValue(dbPath(), snapshot => {
         firebaseState = normalizeFirebaseState(snapshot.val());
         firebaseReady = true;
         applyScreenRatioClass();
         updateAdminModeVisibility();
-        renderAll();
+        scheduleRenderAll(110);
       }, error => {
         console.error("Firebase 실시간 연결 오류", error);
         alert("Firebase 실시간 연결에 실패했습니다. 데이터베이스 규칙과 인터넷 연결을 확인해주세요.");
