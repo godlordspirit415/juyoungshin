@@ -2706,7 +2706,24 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBQZC_ekFU1nD0K7ERJdEhEU3xpjLBgiBI",
+      authDomain: "acts-cheer-up-booth.firebaseapp.com",
+      databaseURL: "https://acts-cheer-up-booth-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "acts-cheer-up-booth",
+      storageBucket: "acts-cheer-up-booth.firebasestorage.app",
+      messagingSenderId: "554640855463",
+      appId: "1:554640855463:web:e53ba9c69ed16f390a6682"
+    };
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const realtimeDb = getDatabase(firebaseApp);
+    const FIREBASE_ROOT = "acts_cheer_up_booth_live";
+
     const STORAGE_KEY = "acts_cheer_up_booth_messages";
     const NOTICE_KEY = "acts_cheer_up_booth_notice";
     const PREDICTIONS_KEY = "acts_cheer_up_booth_predictions";
@@ -2737,70 +2754,221 @@
     let lastPlayedNoticeUpdatedAt = null;
     let audioContext = null;
 
+    const firebaseDefaultState = {
+      messages: {},
+      notice: { active: false, title: "", body: "", updatedAt: "" },
+      predictions: [],
+      votes: {},
+      screen: { ratio43: false, mode: "live" },
+      ticker: { active: false, text: "", updatedAt: "" },
+      gaugeBattles: [],
+      gaugeBoosts: {}
+    };
+
+    let firebaseReady = false;
+    let firebaseState = { ...firebaseDefaultState };
+
+    function dbPath(path = "") {
+      const cleanPath = String(path || "").replace(/^\/+|\/+$/g, "");
+      return ref(realtimeDb, cleanPath ? `${FIREBASE_ROOT}/${cleanPath}` : FIREBASE_ROOT);
+    }
+
+    function arrayToFirebaseCollection(items) {
+      if (!Array.isArray(items)) return items && typeof items === "object" ? items : {};
+      return items.reduce((acc, item) => {
+        if (!item) return acc;
+        const id = String(item.id || `item_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+        acc[id] = { ...item, id };
+        return acc;
+      }, {});
+    }
+
+    function collectionToArray(collection) {
+      if (Array.isArray(collection)) return collection.filter(Boolean);
+      if (!collection || typeof collection !== "object") return [];
+      return Object.entries(collection).map(([key, value]) => ({ ...(value || {}), id: value?.id ?? key }));
+    }
+
+    function safeArray(value) {
+      if (Array.isArray(value)) return value.filter(Boolean);
+      if (value && typeof value === "object") return Object.values(value).filter(Boolean);
+      return [];
+    }
+
+    function toFirebaseSafeKey(value) {
+      return encodeURIComponent(String(value || "").trim()).replace(/\./g, "%2E");
+    }
+
+    function getLocalJson(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+      } catch (error) {
+        console.warn("로컬 데이터를 읽을 수 없습니다.", key, error);
+        return fallback;
+      }
+    }
+
+    function normalizeFirebaseState(data) {
+      const source = data || {};
+      return {
+        messages: collectionToArray(source.messages).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)),
+        notice: source.notice || { ...firebaseDefaultState.notice },
+        predictions: safeArray(source.predictions),
+        votes: source.votes || {},
+        screen: { ...firebaseDefaultState.screen, ...(source.screen || {}) },
+        ticker: source.ticker || { ...firebaseDefaultState.ticker },
+        gaugeBattles: safeArray(source.gaugeBattles),
+        gaugeBoosts: source.gaugeBoosts || {}
+      };
+    }
+
+    function writeFirebase(path, value) {
+      return set(dbPath(path), value).catch(error => {
+        console.error("Firebase 저장 오류", path, error);
+        alert("데이터 저장 중 문제가 발생했습니다. Firebase 규칙과 인터넷 연결을 확인해주세요.");
+      });
+    }
+
+    function patchFirebase(path, value) {
+      return update(dbPath(path), value).catch(error => {
+        console.error("Firebase 업데이트 오류", path, error);
+        alert("데이터 업데이트 중 문제가 발생했습니다. Firebase 규칙과 인터넷 연결을 확인해주세요.");
+      });
+    }
+
+    function removeFirebase(path) {
+      return remove(dbPath(path)).catch(error => {
+        console.error("Firebase 삭제 오류", path, error);
+        alert("데이터 삭제 중 문제가 발생했습니다. Firebase 규칙과 인터넷 연결을 확인해주세요.");
+      });
+    }
+
     function getMessages() {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      if (firebaseReady) return firebaseState.messages;
+      return getLocalJson(STORAGE_KEY, []);
     }
 
     function saveMessages(messages) {
+      if (firebaseReady) {
+        firebaseState.messages = Array.isArray(messages) ? messages : [];
+        writeFirebase("messages", arrayToFirebaseCollection(messages));
+        renderAll();
+        return;
+      }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
       renderAll();
     }
 
     function getPredictions() {
-      return JSON.parse(localStorage.getItem(PREDICTIONS_KEY) || "[]");
+      if (firebaseReady) return firebaseState.predictions;
+      return getLocalJson(PREDICTIONS_KEY, []);
     }
 
     function savePredictions(predictions, shouldRender = true) {
+      if (firebaseReady) {
+        firebaseState.predictions = Array.isArray(predictions) ? predictions : [];
+        writeFirebase("predictions", firebaseState.predictions);
+        if (shouldRender) renderAll();
+        return;
+      }
       localStorage.setItem(PREDICTIONS_KEY, JSON.stringify(predictions));
       if (shouldRender) renderAll();
     }
 
     function getVotes() {
-      return JSON.parse(localStorage.getItem(VOTES_KEY) || "{}");
+      if (firebaseReady) return firebaseState.votes;
+      return getLocalJson(VOTES_KEY, {});
     }
 
     function saveVotes(votes) {
+      if (firebaseReady) {
+        firebaseState.votes = votes || {};
+        writeFirebase("votes", firebaseState.votes);
+        renderAll();
+        return;
+      }
       localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
       renderAll();
     }
 
+    function getScreenSettings() {
+      if (firebaseReady) return firebaseState.screen || { ...firebaseDefaultState.screen };
+      return {
+        ratio43: localStorage.getItem(SCREEN_RATIO_KEY) === "true",
+        mode: localStorage.getItem(SCREEN_MODE_KEY) || "live"
+      };
+    }
+
     function isScreenRatio43() {
-      return localStorage.getItem(SCREEN_RATIO_KEY) === "true";
+      return getScreenSettings().ratio43 === true;
     }
 
     function getScreenMode() {
-      return localStorage.getItem(SCREEN_MODE_KEY) || "live";
+      return getScreenSettings().mode || "live";
+    }
+
+    function saveScreenSetting(key, value) {
+      if (firebaseReady) {
+        firebaseState.screen = { ...firebaseState.screen, [key]: value };
+        writeFirebase(`screen/${key}`, value);
+        renderAll();
+        return;
+      }
+      if (key === "ratio43") localStorage.setItem(SCREEN_RATIO_KEY, value ? "true" : "false");
+      if (key === "mode") localStorage.setItem(SCREEN_MODE_KEY, value === "ready" ? "ready" : "live");
+      renderAll();
     }
 
     function getTicker() {
-      return JSON.parse(localStorage.getItem(TICKER_KEY) || '{"active":false,"text":"","updatedAt":""}');
+      if (firebaseReady) return firebaseState.ticker || { ...firebaseDefaultState.ticker };
+      return getLocalJson(TICKER_KEY, { active: false, text: "", updatedAt: "" });
     }
 
     function saveTicker(ticker) {
+      if (firebaseReady) {
+        firebaseState.ticker = ticker || { ...firebaseDefaultState.ticker };
+        writeFirebase("ticker", firebaseState.ticker);
+        renderAll();
+        return;
+      }
       localStorage.setItem(TICKER_KEY, JSON.stringify(ticker));
       renderAll();
     }
 
     function getGaugeBattles() {
-      return JSON.parse(localStorage.getItem(GAUGE_BATTLES_KEY) || "[]");
+      if (firebaseReady) return firebaseState.gaugeBattles;
+      return getLocalJson(GAUGE_BATTLES_KEY, []);
     }
 
     function saveGaugeBattles(battles, shouldRender = true) {
+      if (firebaseReady) {
+        firebaseState.gaugeBattles = Array.isArray(battles) ? battles : [];
+        writeFirebase("gaugeBattles", firebaseState.gaugeBattles);
+        if (shouldRender) renderAll();
+        return;
+      }
       localStorage.setItem(GAUGE_BATTLES_KEY, JSON.stringify(battles));
       if (shouldRender) renderAll();
     }
 
     function getGaugeBoosts() {
-      return JSON.parse(localStorage.getItem(GAUGE_BOOSTS_KEY) || "{}");
+      if (firebaseReady) return firebaseState.gaugeBoosts;
+      return getLocalJson(GAUGE_BOOSTS_KEY, {});
     }
 
     function saveGaugeBoosts(boosts) {
+      if (firebaseReady) {
+        firebaseState.gaugeBoosts = boosts || {};
+        writeFirebase("gaugeBoosts", firebaseState.gaugeBoosts);
+        renderAll();
+        return;
+      }
       localStorage.setItem(GAUGE_BOOSTS_KEY, JSON.stringify(boosts));
       renderAll();
     }
 
     function getGaugeChoices() {
-      return JSON.parse(localStorage.getItem(GAUGE_CHOICE_KEY) || "{}");
+      return getLocalJson(GAUGE_CHOICE_KEY, {});
     }
 
     function getGaugeChoice(battleId) {
@@ -2845,7 +3013,10 @@
     function getGaugeStats(battle) {
       const options = getGaugeOptions(battle);
       const battleBoosts = getGaugeBoosts()[battle.id] || {};
-      const counts = options.map(option => Number(battleBoosts[option] || 0));
+      const counts = options.map(option => {
+        const safeKey = toFirebaseSafeKey(option);
+        return Number(battleBoosts[option] ?? battleBoosts[safeKey] ?? 0);
+      });
       const total = counts.reduce((sum, count) => sum + count, 0);
       const maxCount = Math.max(1, ...counts);
       const percentages = counts.map(count => Math.round((count / maxCount) * 100));
@@ -2873,16 +3044,13 @@
 
     function toggleScreenRatio43() {
       if (!requireAdminMode()) return;
-      localStorage.setItem(SCREEN_RATIO_KEY, isScreenRatio43() ? "false" : "true");
-      applyScreenRatioClass();
-      renderAll();
+      saveScreenSetting("ratio43", !isScreenRatio43());
     }
 
     function setScreenMode(mode) {
       if (!requireAdminMode()) return;
       const nextMode = mode === "ready" ? "ready" : "live";
-      localStorage.setItem(SCREEN_MODE_KEY, nextMode);
-      renderAll();
+      saveScreenSetting("mode", nextMode);
     }
 
     function formatCurrentTime() {
@@ -2923,7 +3091,9 @@
     }
 
     function getNotice() {
-      const notice = JSON.parse(localStorage.getItem(NOTICE_KEY) || '{"active":false,"title":"","body":""}');
+      const notice = firebaseReady
+        ? (firebaseState.notice || { active: false, title: "", body: "", updatedAt: "" })
+        : getLocalJson(NOTICE_KEY, { active: false, title: "", body: "", updatedAt: "" });
       if (notice.text && !notice.title && !notice.body) {
         return {
           active: notice.active,
@@ -2936,6 +3106,12 @@
     }
 
     function saveNotice(notice) {
+      if (firebaseReady) {
+        firebaseState.notice = notice || { active: false, title: "", body: "", updatedAt: "" };
+        writeFirebase("notice", firebaseState.notice);
+        renderAll();
+        return;
+      }
       localStorage.setItem(NOTICE_KEY, JSON.stringify(notice));
       renderAll();
     }
@@ -2957,7 +3133,7 @@
       return "dept-default";
     }
 
-    function showPage(pageId) {
+    function showPage(pageId, shouldUpdateHash = true) {
       if (pageId === "screen" && !isAdminUnlocked) {
         alert("송출 화면은 관리자 모드 입장 후 열 수 있습니다.");
         pageId = "admin";
@@ -2966,6 +3142,10 @@
       document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
       const targetPage = document.getElementById(pageId);
       if (targetPage) targetPage.classList.add("active");
+
+      if (shouldUpdateHash && ["submit", "admin", "screen"].includes(pageId)) {
+        history.replaceState(null, "", `#${pageId}`);
+      }
 
       updateAdminModeVisibility();
       renderAll();
@@ -3037,8 +3217,14 @@
         createdAt: new Date().toISOString()
       };
 
-      messages.unshift(newMessage);
-      saveMessages(messages);
+      if (firebaseReady) {
+        firebaseState.messages = [newMessage, ...getMessages()];
+        writeFirebase(`messages/${newMessage.id}`, newMessage);
+        renderAll();
+      } else {
+        messages.unshift(newMessage);
+        saveMessages(messages);
+      }
 
       document.getElementById("name").value = "";
       document.getElementById("department").value = "";
@@ -3051,13 +3237,27 @@
 
     function approveMessage(id) {
       if (!requireAdminMode()) return;
-      const messages = getMessages().map(msg => msg.id === id ? { ...msg, status: "approved" } : msg);
+      if (firebaseReady) {
+        const messageId = String(id);
+        firebaseState.messages = getMessages().map(msg => String(msg.id) === messageId ? { ...msg, status: "approved" } : msg);
+        patchFirebase(`messages/${messageId}`, { status: "approved" });
+        renderAll();
+        return;
+      }
+      const messages = getMessages().map(msg => String(msg.id) === String(id) ? { ...msg, status: "approved" } : msg);
       saveMessages(messages);
     }
 
     function deleteMessage(id) {
       if (!requireAdminMode()) return;
-      const messages = getMessages().filter(msg => msg.id !== id);
+      if (firebaseReady) {
+        const messageId = String(id);
+        firebaseState.messages = getMessages().filter(msg => String(msg.id) !== messageId);
+        removeFirebase(`messages/${messageId}`);
+        renderAll();
+        return;
+      }
+      const messages = getMessages().filter(msg => String(msg.id) !== String(id));
       saveMessages(messages);
     }
 
@@ -3083,10 +3283,23 @@
 
     function togglePin(id) {
       if (!requireAdminMode()) return;
+      const messageId = String(id);
       const messages = getMessages();
-      const target = messages.find(msg => msg.id === id);
+      const target = messages.find(msg => String(msg.id) === messageId);
       const shouldPin = target ? !target.pinned : false;
-      const updatedMessages = messages.map(msg => ({ ...msg, pinned: msg.id === id ? shouldPin : false }));
+      const updatedMessages = messages.map(msg => ({ ...msg, pinned: String(msg.id) === messageId ? shouldPin : false }));
+
+      if (firebaseReady) {
+        firebaseState.messages = updatedMessages;
+        const updates = {};
+        updatedMessages.forEach(msg => {
+          updates[`messages/${msg.id}/pinned`] = !!msg.pinned;
+        });
+        patchFirebase("", updates);
+        renderAll();
+        return;
+      }
+
       saveMessages(updatedMessages);
     }
 
@@ -3202,7 +3415,13 @@
       const votes = getVotes();
       votes[predictionId] = votes[predictionId] || {};
       votes[predictionId][voterId] = { optionIndex, updatedAt: new Date().toISOString() };
-      saveVotes(votes);
+      if (firebaseReady) {
+        firebaseState.votes = votes;
+        writeFirebase(`votes/${predictionId}/${voterId}`, votes[predictionId][voterId]);
+        renderAll();
+      } else {
+        saveVotes(votes);
+      }
     }
 
     function cancelPredictionVote(predictionId) {
@@ -3211,7 +3430,13 @@
       if (votes[predictionId] && votes[predictionId][voterId]) {
         delete votes[predictionId][voterId];
       }
-      saveVotes(votes);
+      if (firebaseReady) {
+        firebaseState.votes = votes;
+        removeFirebase(`votes/${predictionId}/${voterId}`);
+        renderAll();
+      } else {
+        saveVotes(votes);
+      }
     }
 
     function getVoteStats(prediction) {
@@ -3503,15 +3728,35 @@
       reader.onload = () => {
         try {
           const data = JSON.parse(reader.result);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.isArray(data.messages) ? data.messages : []));
-          localStorage.setItem(NOTICE_KEY, JSON.stringify(data.notice || { active: false, title: "", body: "" }));
-          localStorage.setItem(PREDICTIONS_KEY, JSON.stringify(Array.isArray(data.predictions) ? data.predictions : []));
-          localStorage.setItem(VOTES_KEY, JSON.stringify(data.votes || {}));
-          localStorage.setItem(GAUGE_BATTLES_KEY, JSON.stringify(Array.isArray(data.gaugeBattles) ? data.gaugeBattles : []));
-          localStorage.setItem(GAUGE_BOOSTS_KEY, JSON.stringify(data.gaugeBoosts || {}));
-          localStorage.setItem(TICKER_KEY, JSON.stringify(data.ticker || { active: false, text: "", updatedAt: "" }));
-          localStorage.setItem(SCREEN_RATIO_KEY, data.screen?.ratio43 ? "true" : "false");
-          localStorage.setItem(SCREEN_MODE_KEY, data.screen?.mode === "ready" ? "ready" : "live");
+          const restoredData = {
+            messages: arrayToFirebaseCollection(Array.isArray(data.messages) ? data.messages : []),
+            notice: data.notice || { active: false, title: "", body: "", updatedAt: "" },
+            predictions: Array.isArray(data.predictions) ? data.predictions : [],
+            votes: data.votes || {},
+            gaugeBattles: Array.isArray(data.gaugeBattles) ? data.gaugeBattles : [],
+            gaugeBoosts: data.gaugeBoosts || {},
+            ticker: data.ticker || { active: false, text: "", updatedAt: "" },
+            screen: {
+              ratio43: !!data.screen?.ratio43,
+              mode: data.screen?.mode === "ready" ? "ready" : "live"
+            }
+          };
+
+          if (firebaseReady) {
+            firebaseState = normalizeFirebaseState(restoredData);
+            writeFirebase("", restoredData);
+          } else {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.isArray(data.messages) ? data.messages : []));
+            localStorage.setItem(NOTICE_KEY, JSON.stringify(restoredData.notice));
+            localStorage.setItem(PREDICTIONS_KEY, JSON.stringify(restoredData.predictions));
+            localStorage.setItem(VOTES_KEY, JSON.stringify(restoredData.votes));
+            localStorage.setItem(GAUGE_BATTLES_KEY, JSON.stringify(restoredData.gaugeBattles));
+            localStorage.setItem(GAUGE_BOOSTS_KEY, JSON.stringify(restoredData.gaugeBoosts));
+            localStorage.setItem(TICKER_KEY, JSON.stringify(restoredData.ticker));
+            localStorage.setItem(SCREEN_RATIO_KEY, restoredData.screen.ratio43 ? "true" : "false");
+            localStorage.setItem(SCREEN_MODE_KEY, restoredData.screen.mode);
+          }
+
           shownMessageIds.clear();
           hasRenderedWallOnce = false;
           lastPlayedNoticeUpdatedAt = null;
@@ -3532,16 +3777,33 @@
       if (!requireAdminMode()) return;
       if (!confirm("모든 메시지, 공지, 승부예측, 게이지 배틀, 티커, 송출 설정을 초기화할까요? 이 작업은 되돌릴 수 없습니다.")) return;
 
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(NOTICE_KEY);
-      localStorage.removeItem(PREDICTIONS_KEY);
-      localStorage.removeItem(VOTES_KEY);
-      localStorage.removeItem(GAUGE_BATTLES_KEY);
-      localStorage.removeItem(GAUGE_BOOSTS_KEY);
+      const emptyData = {
+        messages: {},
+        notice: { active: false, title: "", body: "", updatedAt: "" },
+        predictions: [],
+        votes: {},
+        gaugeBattles: [],
+        gaugeBoosts: {},
+        ticker: { active: false, text: "", updatedAt: "" },
+        screen: { ratio43: false, mode: "live" }
+      };
+
+      if (firebaseReady) {
+        firebaseState = normalizeFirebaseState(emptyData);
+        writeFirebase("", emptyData);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(NOTICE_KEY);
+        localStorage.removeItem(PREDICTIONS_KEY);
+        localStorage.removeItem(VOTES_KEY);
+        localStorage.removeItem(GAUGE_BATTLES_KEY);
+        localStorage.removeItem(GAUGE_BOOSTS_KEY);
+        localStorage.removeItem(TICKER_KEY);
+        localStorage.setItem(SCREEN_RATIO_KEY, "false");
+        localStorage.setItem(SCREEN_MODE_KEY, "live");
+      }
+
       localStorage.removeItem(GAUGE_CHOICE_KEY);
-      localStorage.removeItem(TICKER_KEY);
-      localStorage.setItem(SCREEN_RATIO_KEY, "false");
-      localStorage.setItem(SCREEN_MODE_KEY, "live");
       shownMessageIds.clear();
       hasRenderedWallOnce = false;
       lastPlayedNoticeUpdatedAt = null;
@@ -3599,7 +3861,7 @@
       };
 
       battles.unshift(newBattle);
-      localStorage.setItem(SCREEN_MODE_KEY, "live");
+      saveScreenSetting("mode", "live");
       saveGaugeBattles(battles);
       if (titleInput) titleInput.value = "";
     }
@@ -3655,9 +3917,21 @@
       lastGaugeBoostAt = now;
 
       const boosts = getGaugeBoosts();
+      const safeDepartmentKey = toFirebaseSafeKey(department);
       boosts[battleId] = boosts[battleId] || {};
-      boosts[battleId][department] = Number(boosts[battleId][department] || 0) + 1;
-      saveGaugeBoosts(boosts);
+      boosts[battleId][safeDepartmentKey] = Number(boosts[battleId][safeDepartmentKey] || boosts[battleId][department] || 0) + 1;
+
+      if (firebaseReady) {
+        firebaseState.gaugeBoosts = boosts;
+        runTransaction(dbPath(`gaugeBoosts/${battleId}/${safeDepartmentKey}`), currentValue => Number(currentValue || 0) + 1)
+          .catch(error => {
+            console.error("게이지 BOOST 저장 오류", error);
+            alert("BOOST 저장 중 문제가 발생했습니다. 인터넷 연결을 확인해주세요.");
+          });
+        renderAll();
+      } else {
+        saveGaugeBoosts(boosts);
+      }
     }
 
     function renderGaugeMiniRows(battle) {
@@ -3884,10 +4158,10 @@
           <p>${escapeHtml(msg.message)}</p>
           <div class="card-actions">
             ${isPending
-              ? `<button class="approve" onclick="approveMessage(${msg.id})">승인</button>`
-              : `<button class="pin" onclick="togglePin(${msg.id})">${msg.pinned ? "고정 해제" : "상단 고정"}</button>`
+              ? `<button class="approve" onclick="approveMessage('${escapeJs(String(msg.id))}')">승인</button>`
+              : `<button class="pin" onclick="togglePin('${escapeJs(String(msg.id))}')">${msg.pinned ? "고정 해제" : "상단 고정"}</button>`
             }
-            <button class="delete" onclick="deleteMessage(${msg.id})">삭제</button>
+            <button class="delete" onclick="deleteMessage('${escapeJs(String(msg.id))}')">삭제</button>
           </div>
         </div>
       `;
@@ -4092,9 +4366,63 @@
       }
     });
 
+    function setupFirebaseRealtimeSync() {
+      onValue(dbPath(), snapshot => {
+        firebaseState = normalizeFirebaseState(snapshot.val());
+        firebaseReady = true;
+        applyScreenRatioClass();
+        updateAdminModeVisibility();
+        renderAll();
+      }, error => {
+        console.error("Firebase 실시간 연결 오류", error);
+        alert("Firebase 실시간 연결에 실패했습니다. 데이터베이스 규칙과 인터넷 연결을 확인해주세요.");
+      });
+    }
+
+    function openInitialPageFromHash() {
+      const pageId = (location.hash || "#submit").replace("#", "");
+      if (["submit", "admin", "screen"].includes(pageId)) {
+        showPage(pageId, false);
+      }
+    }
+
+    Object.assign(window, {
+      approveMessage,
+      cancelPredictionVote,
+      cheerUpGaugeBattle,
+      clearBroadcastNotice,
+      clearGaugeChoice,
+      clearTicker,
+      closePastResults,
+      deleteMessage,
+      downloadBackupData,
+      endActiveGaugeBattle,
+      endActivePrediction,
+      hideLatestPredictionResult,
+      openPastResults,
+      resetAllData,
+      restoreBackupData,
+      setGaugeChoice,
+      setScreenMode,
+      showBroadcastNotice,
+      showPage,
+      showTicker,
+      startGaugeBattle,
+      startPrediction,
+      submitMessage,
+      toggleApprovedAllPanel,
+      togglePin,
+      toggleScreenRatio43,
+      triggerRestoreBackup,
+      unlockAdminMode,
+      votePrediction
+    });
+
     applyScreenRatioClass();
     updateAdminModeVisibility();
     renderAll();
+    setupFirebaseRealtimeSync();
+    openInitialPageFromHash();
     setInterval(renderAll, 1000);
   </script>
 </body>
