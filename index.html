@@ -1,0 +1,4101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACTS CHEER-UP BOOTH | 아신대학교 체육대회</title>
+
+  <style>
+    :root {
+      --blue: #16A34A;
+      --deep-blue: #052E16;
+      --sky: #DCFCE7;
+      --white: #ffffff;
+      --yellow: #D9F99D;
+      --green: #22C55E;
+      --red: #FF5A5A;
+      --gray: #6B7280;
+      --dark: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", sans-serif;
+      background: linear-gradient(135deg, #052E16 0%, #15803D 45%, #86EFAC 100%);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    button, input, textarea, select {
+      font-family: inherit;
+    }
+
+    .top-nav {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .top-nav button {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 999px;
+      color: white;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 700;
+      opacity: 0.8;
+    }
+
+    .top-nav button.active {
+      background: white;
+      color: var(--deep-blue);
+      opacity: 1;
+    }
+
+    .page {
+      display: none;
+      min-height: 100vh;
+      padding: 42px 20px 40px;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .container {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .hero h1 {
+      margin: 18px 0 10px;
+      font-size: clamp(36px, 7vw, 84px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      font-weight: 950;
+    }
+
+    .hero p {
+      margin: 0;
+      font-size: clamp(16px, 2.2vw, 24px);
+      color: rgba(255,255,255,0.82);
+      word-break: keep-all;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.94);
+      color: var(--dark);
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 720px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-nav {
+        width: calc(100% - 24px);
+        overflow-x: auto;
+        justify-content: flex-start;
+      }
+
+      .top-nav button {
+        white-space: nowrap;
+      }
+    }
+
+    label {
+      display: block;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #1F2937;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 2px solid #E5E7EB;
+      border-radius: 18px;
+      padding: 15px 16px;
+      font-size: 16px;
+      outline: none;
+      background: white;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green);
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .submit-btn {
+      width: 100%;
+      margin-top: 18px;
+      border: none;
+      border-radius: 20px;
+      padding: 18px 20px;
+      background: linear-gradient(135deg, #16A34A, #065F46);
+      color: white;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(22, 163, 74, 0.35);
+    }
+
+    .notice {
+      margin-top: 14px;
+      color: #4B5563;
+      font-size: 14px;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    .success {
+      display: none;
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 18px;
+      background: #ECFDF5;
+      color: #047857;
+      font-weight: 800;
+    }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    @media (max-width: 900px) {
+      .admin-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .admin-box {
+      background: rgba(255,255,255,0.95);
+      color: var(--dark);
+      border-radius: 24px;
+      padding: 22px;
+      min-height: 420px;
+    }
+
+    .admin-box h2 {
+      margin: 0 0 16px;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .message-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .admin-card {
+      border: 1px solid #E5E7EB;
+      border-radius: 18px;
+      padding: 16px;
+      background: white;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #6B7280;
+    }
+
+    .dept-tag {
+      display: inline-flex;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--sky);
+      color: var(--blue);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .admin-card p {
+      margin: 0;
+      line-height: 1.6;
+      word-break: keep-all;
+      font-size: 16px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .card-actions button {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .approve {
+      background: #ECFDF5;
+      color: #047857;
+    }
+
+    .delete {
+      background: #FEF2F2;
+      color: #B91C1C;
+    }
+
+    .pin {
+      background: #FFFBEB;
+      color: #B45309;
+    }
+
+    .empty {
+      color: #6B7280;
+      padding: 18px;
+      border-radius: 16px;
+      background: #F9FAFB;
+      text-align: center;
+    }
+
+    .screen-page {
+      padding: 36px;
+      overflow: hidden;
+    }
+
+    .screen-shell {
+      min-height: calc(100vh - 72px);
+      border-radius: 42px;
+      padding: clamp(28px, 4vw, 64px);
+      background:
+        radial-gradient(circle at top left, rgba(217,249,157,0.35), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(34,197,94,0.26), transparent 32%),
+        linear-gradient(135deg, #052E16 0%, #15803D 50%, #22C55E 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14), 0 30px 100px rgba(0,0,0,0.35);
+      position: relative;
+    }
+
+    .screen-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .screen-title h1 {
+      margin: 0;
+      font-size: clamp(42px, 6vw, 96px);
+      letter-spacing: -0.07em;
+      line-height: 0.92;
+      font-weight: 1000;
+    }
+
+    .screen-title p {
+      margin: 14px 0 0;
+      font-size: clamp(16px, 2vw, 28px);
+      color: rgba(255,255,255,0.78);
+      font-weight: 700;
+    }
+
+    .qr-box {
+      width: 170px;
+      min-width: 170px;
+      aspect-ratio: 1 / 1;
+      background: white;
+      border-radius: 24px;
+      color: var(--deep-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: 950;
+      padding: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.24);
+    }
+
+    .wall-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 1000px) {
+      .wall-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .qr-box {
+        display: none;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .wall-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .screen-page {
+        padding: 12px;
+      }
+    }
+
+    .live-card {
+      min-height: 180px;
+      border-radius: 28px;
+      padding: 24px;
+      background: rgba(255,255,255,0.94);
+      color: #052E16;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.22);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .live-card.new-card {
+      animation: popIn 0.4s ease both, firstGlow 1.4s ease-out 1;
+    }
+
+    .live-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, #D9F99D, #22C55E, #047857);
+    }
+
+    .live-card.pinned {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #FFFFFF, #DCFCE7);
+    }
+
+    .live-card .dept {
+      display: inline-flex;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #DCFCE7;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 950;
+      margin-bottom: 14px;
+    }
+
+    .live-card .text {
+      margin: 0;
+      font-size: clamp(20px, 2vw, 32px);
+      line-height: 1.35;
+      letter-spacing: -0.04em;
+      font-weight: 900;
+      word-break: keep-all;
+    }
+
+    .live-card .name {
+      margin-top: 18px;
+      color: #6B7280;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .waiting {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      border: 2px dashed rgba(255,255,255,0.35);
+      border-radius: 32px;
+      color: rgba(255,255,255,0.75);
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .floating-label {
+      position: absolute;
+      bottom: 58px;
+      right: 36px;
+      color: rgba(255,255,255,0.55);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      font-size: 14px;
+    }
+
+
+    .presented-footer {
+      margin-top: 32px;
+      text-align: center;
+      color: rgba(255,255,255,0.72);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      font-size: 14px;
+    }
+
+    .screen-shell .presented-footer {
+      position: absolute;
+      left: 36px;
+      bottom: 28px;
+      margin: 0;
+      color: rgba(255,255,255,0.68);
+    }
+
+    .admin-notice-panel {
+      margin-bottom: 22px;
+    }
+
+    .admin-notice-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .clear-notice-btn {
+      width: 100%;
+      border: none;
+      border-radius: 20px;
+      padding: 18px 20px;
+      background: #F3F4F6;
+      color: #374151;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .current-notice-status {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #F9FAFB;
+      color: #4B5563;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .current-notice-status span {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .screen-alert {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(900px, calc(100vw - 48px));
+      z-index: 80;
+      border-radius: 36px;
+      padding: clamp(28px, 4vw, 56px);
+      background: rgba(255,255,255,0.96);
+      color: #052E16;
+      text-align: center;
+      box-shadow: 0 30px 100px rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.7);
+      animation: alertPop 0.45s ease both;
+    }
+
+    .screen-alert .alert-label {
+      display: inline-flex;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: #DCFCE7;
+      color: #047857;
+      font-weight: 950;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .screen-alert .alert-title {
+      margin: 0;
+      font-size: clamp(32px, 4.5vw, 72px);
+      line-height: 1.12;
+      letter-spacing: -0.05em;
+      font-weight: 1000;
+      word-break: keep-all;
+    }
+
+    .screen-alert .alert-body {
+      margin: 16px 0 0;
+      font-size: clamp(18px, 2.2vw, 34px);
+      line-height: 1.45;
+      letter-spacing: -0.03em;
+      font-weight: 500;
+      color: #374151;
+      word-break: keep-all;
+      white-space: pre-line;
+    }
+
+    .dept-red { --dept-color: #EF4444; --dept-bg: #FEF2F2; }
+    .dept-green { --dept-color: #16A34A; --dept-bg: #ECFDF5; }
+    .dept-pink { --dept-color: #EC4899; --dept-bg: #FDF2F8; }
+    .dept-purple { --dept-color: #8B5CF6; --dept-bg: #F5F3FF; }
+    .dept-gray { --dept-color: #6B7280; --dept-bg: #F3F4F6; }
+    .dept-blue { --dept-color: #2563EB; --dept-bg: #EFF6FF; }
+    .dept-default { --dept-color: #047857; --dept-bg: #DCFCE7; }
+
+    .live-card .dept {
+      background: var(--dept-bg);
+      color: var(--dept-color);
+    }
+
+    .live-card::before {
+      background: linear-gradient(90deg, var(--dept-color), #22C55E, #D9F99D);
+    }
+
+    .live-card.pinned {
+      border: 3px solid var(--dept-color);
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes firstGlow {
+      0% {
+        box-shadow: 0 20px 45px rgba(0,0,0,0.22), 0 0 0 rgba(217,249,157,0);
+      }
+      35% {
+        box-shadow: 0 20px 45px rgba(0,0,0,0.22), 0 0 42px rgba(217,249,157,0.95);
+      }
+      100% {
+        box-shadow: 0 20px 45px rgba(0,0,0,0.22), 0 0 0 rgba(217,249,157,0);
+      }
+    }
+
+    @keyframes alertPop {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -46%) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    /* 관리자 PICK 고정 메시지 스타일 */
+    .live-card::before {
+      display: none !important;
+    }
+
+    .live-card.pinned {
+      border: 4px solid #FACC15 !important;
+      box-shadow: 0 22px 50px rgba(250, 204, 21, 0.24), 0 20px 45px rgba(0,0,0,0.22);
+    }
+
+    .admin-pick-label {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      color: #16A34A;
+      font-size: 15px;
+      font-weight: 1000;
+      letter-spacing: -0.02em;
+      z-index: 2;
+    }
+
+
+
+    /* 승부예측 기능 */
+    .prediction-panel {
+      margin-top: 22px;
+      border: 2px solid #DCFCE7;
+      background: linear-gradient(135deg, #FFFFFF, #F0FDF4);
+    }
+
+    .prediction-panel h2,
+    .prediction-admin-panel h2 {
+      margin: 0 0 10px;
+      color: #052E16;
+      letter-spacing: -0.04em;
+      font-size: 26px;
+    }
+
+    .prediction-subtext {
+      margin: 0 0 18px;
+      color: #6B7280;
+      line-height: 1.5;
+      word-break: keep-all;
+      font-weight: 700;
+    }
+
+    .prediction-countdown {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #DCFCE7;
+      color: #047857;
+      font-weight: 950;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .prediction-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .prediction-option-btn {
+      border: 2px solid #D1FAE5;
+      background: white;
+      color: #052E16;
+      border-radius: 20px;
+      padding: 18px;
+      cursor: pointer;
+      font-weight: 950;
+      font-size: 18px;
+      box-shadow: 0 10px 22px rgba(6, 95, 70, 0.08);
+    }
+
+    .prediction-option-btn.selected {
+      border-color: #16A34A;
+      background: #DCFCE7;
+      color: #047857;
+      box-shadow: 0 14px 30px rgba(22, 163, 74, 0.24);
+    }
+
+    .prediction-cancel-btn,
+    .past-result-btn,
+    .admin-small-btn {
+      border: none;
+      background: transparent;
+      color: #6B7280;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: underline;
+      margin-top: 12px;
+      padding: 4px 0;
+    }
+
+    .prediction-empty {
+      padding: 18px;
+      border-radius: 18px;
+      background: #F9FAFB;
+      color: #6B7280;
+      text-align: center;
+      font-weight: 850;
+      line-height: 1.5;
+    }
+
+    .prediction-result-card {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .result-row {
+      display: grid;
+      grid-template-columns: 130px 1fr 72px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .result-label {
+      color: #052E16;
+      font-weight: 950;
+      word-break: keep-all;
+    }
+
+    .result-bar-wrap {
+      height: 18px;
+      border-radius: 999px;
+      background: #E5E7EB;
+      overflow: hidden;
+    }
+
+    .result-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #16A34A, #86EFAC);
+      transition: width 0.35s ease;
+    }
+
+    .result-percent {
+      color: #047857;
+      font-weight: 950;
+      text-align: right;
+    }
+
+    .prediction-admin-panel {
+      margin-bottom: 22px;
+    }
+
+    .prediction-admin-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 0.8fr 0.5fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .prediction-admin-grid,
+      .prediction-options {
+        grid-template-columns: 1fr;
+      }
+
+      .result-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .result-percent {
+        text-align: left;
+      }
+    }
+
+    .screen-prediction-wrap {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 1000px) {
+      .screen-prediction-wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .screen-prediction-main {
+      border-radius: 36px;
+      background: rgba(255,255,255,0.96);
+      color: #052E16;
+      padding: clamp(26px, 4vw, 48px);
+      box-shadow: 0 28px 70px rgba(0,0,0,0.26);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .screen-prediction-main::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      bottom: -90px;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.13);
+    }
+
+    .screen-prediction-label {
+      display: inline-flex;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #DCFCE7;
+      color: #047857;
+      font-weight: 1000;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .screen-prediction-title {
+      margin: 0;
+      font-size: clamp(36px, 5vw, 76px);
+      line-height: 1.04;
+      letter-spacing: -0.06em;
+      font-weight: 1000;
+      word-break: keep-all;
+    }
+
+    .screen-prediction-desc {
+      margin: 14px 0 0;
+      color: #4B5563;
+      font-size: clamp(18px, 2vw, 28px);
+      font-weight: 650;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .screen-results {
+      display: grid;
+      gap: 18px;
+      margin-top: 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen-result-row {
+      display: grid;
+      grid-template-columns: 170px 1fr 96px;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .screen-result-label {
+      font-size: clamp(18px, 2vw, 28px);
+      font-weight: 1000;
+      word-break: keep-all;
+    }
+
+    .screen-result-bar-wrap {
+      height: 34px;
+      border-radius: 999px;
+      background: #E5E7EB;
+      overflow: hidden;
+    }
+
+    .screen-result-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #16A34A, #86EFAC);
+      transition: width 0.35s ease;
+    }
+
+    .screen-result-percent {
+      color: #047857;
+      font-size: clamp(22px, 2.4vw, 36px);
+      font-weight: 1000;
+      text-align: right;
+    }
+
+    .screen-prediction-side {
+      border-radius: 36px;
+      background: rgba(5,46,22,0.48);
+      border: 1px solid rgba(255,255,255,0.16);
+      padding: 24px;
+      color: white;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+    }
+
+    .screen-timer {
+      font-size: clamp(32px, 4vw, 64px);
+      font-weight: 1000;
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .screen-total-votes {
+      margin-top: 8px;
+      color: rgba(255,255,255,0.74);
+      font-weight: 850;
+      font-size: 18px;
+    }
+
+    .mini-comment-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+      max-height: 430px;
+      overflow: hidden;
+    }
+
+    .mini-comment {
+      border-radius: 18px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.92);
+      color: #052E16;
+      border-left: 7px solid var(--dept-color, #16A34A);
+    }
+
+    .mini-comment .mini-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: #6B7280;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .mini-comment p {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 850;
+      line-height: 1.35;
+      word-break: keep-all;
+    }
+
+    .past-results-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.48);
+      padding: 20px;
+    }
+
+    .past-results-modal.active {
+      display: flex;
+    }
+
+    .past-results-box {
+      width: min(760px, 100%);
+      max-height: 82vh;
+      overflow: auto;
+      border-radius: 28px;
+      background: white;
+      color: #111827;
+      padding: 26px;
+      box-shadow: 0 30px 100px rgba(0,0,0,0.4);
+    }
+
+    .past-results-box h2 {
+      margin: 0 0 16px;
+      color: #052E16;
+      letter-spacing: -0.04em;
+    }
+
+    .past-result-item {
+      border: 1px solid #E5E7EB;
+      border-radius: 20px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+
+    .close-modal-btn {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 18px;
+      background: #052E16;
+      color: white;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .admin-entry-footer {
+      display: flex;
+      justify-content: center;
+      margin: 18px 0 6px;
+    }
+
+    .admin-entry-btn {
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 999px;
+      padding: 11px 18px;
+      background: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.9);
+      font-weight: 900;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .admin-entry-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .admin-nav-panel {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .admin-nav-panel button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .admin-nav-primary {
+      background: linear-gradient(135deg, #16A34A, #052E16);
+      color: white;
+      box-shadow: 0 12px 26px rgba(22, 163, 74, 0.28);
+    }
+
+    .admin-nav-secondary {
+      background: #F3F4F6;
+      color: #374151;
+    }
+
+
+    .admin-auth-panel {
+      max-width: 520px;
+      margin: 0 auto 22px;
+    }
+
+    .admin-content {
+      display: none;
+    }
+
+    .admin-content.active {
+      display: block;
+    }
+
+
+    /* 추가 운영 기능: 4:3 송출, 긴 메시지 대응, 관리자 대시보드, 티커, READY 화면 */
+    .admin-top-shortcuts {
+      margin-bottom: 22px;
+    }
+
+    .admin-top-shortcuts-label {
+      margin-bottom: 12px;
+      color: #047857;
+      font-weight: 1000;
+      letter-spacing: -0.03em;
+    }
+
+    .admin-top-shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .admin-top-shortcuts-grid button {
+      border: none;
+      border-radius: 18px;
+      padding: 16px 14px;
+      font-weight: 1000;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .admin-dashboard-panel,
+    .screen-control-panel,
+    .admin-backup-panel,
+    .admin-ticker-panel {
+      margin-bottom: 22px;
+    }
+
+    .admin-dashboard-header,
+    .screen-control-header,
+    .backup-header,
+    .ticker-header,
+    .notice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .admin-dashboard-header h2,
+    .screen-control-header h2,
+    .backup-header h2,
+    .ticker-header h2,
+    .notice-header h2 {
+      margin: 0;
+      color: #052E16;
+      letter-spacing: -0.04em;
+      font-size: 26px;
+    }
+
+    .admin-dashboard-header p,
+    .screen-control-header p,
+    .backup-header p,
+    .ticker-header p,
+    .notice-header p {
+      margin: 6px 0 0;
+      color: #6B7280;
+      font-weight: 700;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .admin-stat-card {
+      border-radius: 20px;
+      padding: 18px;
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+    }
+
+    .admin-stat-label {
+      color: #6B7280;
+      font-weight: 900;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .admin-stat-value {
+      color: #052E16;
+      font-weight: 1000;
+      font-size: clamp(26px, 3vw, 38px);
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .admin-stat-desc {
+      margin-top: 8px;
+      color: #6B7280;
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .admin-control-grid,
+    .backup-action-grid,
+    .ticker-action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .admin-control-grid button,
+    .backup-action-grid button,
+    .ticker-action-grid button {
+      border: none;
+      border-radius: 18px;
+      padding: 15px 14px;
+      font-weight: 950;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .control-primary {
+      background: linear-gradient(135deg, #16A34A, #052E16);
+      color: white;
+      box-shadow: 0 12px 26px rgba(22, 163, 74, 0.22);
+    }
+
+    .control-secondary {
+      background: #F3F4F6;
+      color: #374151;
+    }
+
+    .control-danger {
+      background: #FEF2F2;
+      color: #B91C1C;
+    }
+
+    .admin-control-status,
+    .backup-status,
+    .ticker-status {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #F9FAFB;
+      color: #4B5563;
+      font-weight: 800;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .admin-control-status b,
+    .backup-status b,
+    .ticker-status b {
+      color: #052E16;
+    }
+
+    .ticker-input-wrap {
+      margin-top: 12px;
+    }
+
+    .ticker-input-wrap textarea {
+      min-height: 90px;
+    }
+
+    .admin-subsection-title {
+      margin: 24px 0 10px;
+      padding-top: 18px;
+      border-top: 1px solid #E5E7EB;
+      color: #052E16;
+      font-size: 20px;
+      font-weight: 1000;
+      letter-spacing: -0.04em;
+    }
+
+    .admin-layout {
+      margin-bottom: 22px;
+    }
+
+
+    .approved-preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .approved-preview-header h2 {
+      margin: 0;
+    }
+
+    .approved-count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: #DCFCE7;
+      color: #047857;
+      font-weight: 1000;
+      font-size: 14px;
+    }
+
+    .approved-all-toggle-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: #052E16;
+      color: white;
+      font-weight: 950;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .approved-preview-caption {
+      margin: -2px 0 14px;
+      color: #6B7280;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .approved-all-panel {
+      display: none;
+      margin-bottom: 22px;
+    }
+
+    .approved-all-panel.active {
+      display: block;
+    }
+
+    .approved-all-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .approved-all-header h2 {
+      margin: 0;
+      color: #052E16;
+      letter-spacing: -0.04em;
+      font-size: 26px;
+    }
+
+    .approved-all-header p {
+      margin: 6px 0 0;
+      color: #6B7280;
+      font-weight: 750;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .approved-all-close-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 11px 16px;
+      background: #F3F4F6;
+      color: #374151;
+      font-weight: 950;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .approved-all-list {
+      max-height: 620px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .approved-list-summary {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #F9FAFB;
+      color: #4B5563;
+      font-size: 14px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .approved-preview-header,
+      .approved-all-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .approved-all-toggle-btn,
+      .approved-all-close-btn {
+        width: 100%;
+      }
+    }
+
+    .live-card {
+      overflow-wrap: anywhere;
+    }
+
+    .wall-grid {
+      grid-auto-flow: dense;
+      align-items: stretch;
+    }
+
+    .live-card.length-short .text {
+      font-size: clamp(24px, 2.4vw, 36px);
+      line-height: 1.28;
+    }
+
+    .live-card.length-medium .text {
+      font-size: clamp(20px, 2vw, 30px);
+    }
+
+    .live-card.length-long {
+      grid-column: span 2;
+      min-height: 220px;
+    }
+
+    .live-card.length-long .text {
+      font-size: clamp(17px, 1.65vw, 25px);
+      line-height: 1.46;
+      letter-spacing: -0.035em;
+    }
+
+    .live-card .text {
+      overflow-wrap: anywhere;
+    }
+
+    .screen-shell.ready-mode {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .screen-shell.ready-mode .screen-header,
+    .screen-shell.ready-mode .floating-label,
+    .screen-shell.ready-mode .presented-footer,
+    .screen-shell.ready-mode .screen-alert,
+    .screen-shell.ready-mode .screen-ticker {
+      display: none !important;
+    }
+
+    .screen-shell.ready-mode .wall-grid {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: calc(100vh - 72px);
+    }
+
+    .ready-screen {
+      grid-column: 1 / -1;
+      width: 100%;
+      height: 100%;
+      min-height: calc(100vh - 72px);
+      border-radius: inherit;
+      padding: clamp(28px, 5vw, 78px);
+      background:
+        radial-gradient(circle at 18% 20%, rgba(217,249,157,0.18), transparent 26%),
+        radial-gradient(circle at 82% 78%, rgba(34,197,94,0.20), transparent 28%),
+        linear-gradient(135deg, #02170B 0%, #052E16 42%, #15803D 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+
+    .ready-content {
+      position: relative;
+      z-index: 1;
+      width: min(96%, 1500px);
+    }
+
+    .ready-screen h2 {
+      margin: 0;
+      font-size: clamp(44px, 7.5vw, 138px);
+      line-height: 0.94;
+      letter-spacing: -0.075em;
+      font-weight: 1000;
+      word-break: keep-all;
+      white-space: nowrap;
+      text-shadow: 0 18px 56px rgba(0,0,0,0.32);
+    }
+
+    .ready-time {
+      margin-top: clamp(18px, 2.8vw, 42px);
+      font-size: clamp(24px, 3.2vw, 58px);
+      font-weight: 1000;
+      letter-spacing: -0.04em;
+      color: #D9F99D;
+      text-shadow: 0 12px 34px rgba(0,0,0,0.28);
+    }
+
+    .ready-presented-footer {
+      position: absolute;
+      left: 50%;
+      bottom: clamp(24px, 3vw, 42px);
+      transform: translateX(-50%);
+      margin: 0;
+      text-align: center;
+      color: rgba(255,255,255,0.72);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      font-size: 14px;
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+
+    .screen-ticker {
+      position: absolute;
+      left: 36px;
+      right: 36px;
+      bottom: 68px;
+      height: 48px;
+      z-index: 62;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.24);
+      backdrop-filter: blur(12px);
+      color: white;
+      align-items: center;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    }
+
+    .ticker-track {
+      display: inline-block;
+      white-space: nowrap;
+      padding-left: 100%;
+      font-size: clamp(16px, 1.7vw, 22px);
+      font-weight: 950;
+      letter-spacing: -0.02em;
+      animation: tickerMarquee 24s linear infinite;
+    }
+
+    .screen-shell.has-ticker .floating-label {
+      bottom: 126px;
+    }
+
+    @keyframes tickerMarquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-100%); }
+    }
+
+    #screen.ratio-4-3.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: #020617;
+    }
+
+    #screen.ratio-4-3 .screen-shell {
+      width: min(100vw, calc(100vh * 4 / 3));
+      height: min(100vh, calc(100vw * 3 / 4));
+      min-height: auto;
+      border-radius: 0;
+      padding: clamp(22px, 3vw, 44px);
+      overflow: hidden;
+    }
+
+    #screen.ratio-4-3 .screen-header {
+      margin-bottom: 22px;
+    }
+
+    #screen.ratio-4-3 .screen-title h1 {
+      font-size: clamp(34px, 5vw, 72px);
+    }
+
+    #screen.ratio-4-3 .screen-title p {
+      font-size: clamp(14px, 1.5vw, 20px);
+      margin-top: 10px;
+    }
+
+    #screen.ratio-4-3 .badge {
+      padding: 6px 11px;
+      font-size: 12px;
+    }
+
+    #screen.ratio-4-3 .qr-box {
+      width: 132px;
+      min-width: 132px;
+      border-radius: 18px;
+      font-size: 13px;
+    }
+
+    #screen.ratio-4-3 .wall-grid {
+      gap: 12px;
+    }
+
+    #screen.ratio-4-3 .live-card {
+      min-height: 132px;
+      padding: 18px;
+      border-radius: 22px;
+    }
+
+    #screen.ratio-4-3 .live-card.length-long {
+      min-height: 168px;
+    }
+
+    #screen.ratio-4-3 .live-card .dept {
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+
+    #screen.ratio-4-3 .live-card .text {
+      font-size: clamp(16px, 1.65vw, 24px);
+    }
+
+    #screen.ratio-4-3 .live-card.length-long .text {
+      font-size: clamp(14px, 1.35vw, 19px);
+      line-height: 1.42;
+    }
+
+    #screen.ratio-4-3 .live-card .name {
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    #screen.ratio-4-3 .screen-prediction-main,
+    #screen.ratio-4-3 .screen-prediction-side {
+      border-radius: 26px;
+      padding: clamp(20px, 2.8vw, 34px);
+    }
+
+    #screen.ratio-4-3 .screen-prediction-title {
+      font-size: clamp(30px, 4vw, 56px);
+    }
+
+    #screen.ratio-4-3 .screen-result-row {
+      grid-template-columns: 130px 1fr 76px;
+      gap: 12px;
+    }
+
+    #screen.ratio-4-3 .screen-result-bar-wrap {
+      height: 26px;
+    }
+
+    #screen.ratio-4-3 .mini-comment-list {
+      max-height: 270px;
+    }
+
+    #screen.ratio-4-3 .screen-shell.ready-mode {
+      padding: 0;
+      display: block;
+    }
+
+    #screen.ratio-4-3 .screen-shell.ready-mode .wall-grid,
+    #screen.ratio-4-3 .ready-screen {
+      min-height: 100%;
+      height: 100%;
+      width: 100%;
+    }
+
+    #screen.ratio-4-3 .ready-screen {
+      border-radius: 0;
+      aspect-ratio: 4 / 3;
+      padding: clamp(24px, 4vw, 56px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #screen.ratio-4-3 .ready-content {
+      width: 92%;
+      max-width: 1160px;
+      transform: translateY(-2%);
+    }
+
+    #screen.ratio-4-3 .ready-screen h2 {
+      font-size: clamp(34px, 5.6vw, 78px);
+      line-height: 0.95;
+      white-space: nowrap;
+    }
+
+    #screen.ratio-4-3 .ready-time {
+      font-size: clamp(22px, 3vw, 42px);
+      margin-top: clamp(18px, 2.4vw, 28px);
+    }
+
+    #screen.ratio-4-3 .ready-presented-footer {
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+    }
+
+    #screen.ratio-4-3 .screen-ticker {
+      left: 24px;
+      right: 24px;
+      bottom: 48px;
+      height: 38px;
+    }
+
+    #screen.ratio-4-3 .screen-shell .presented-footer {
+      left: 24px;
+      bottom: 18px;
+      font-size: 12px;
+    }
+
+    #screen.ratio-4-3 .floating-label {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .admin-stats-grid,
+      .admin-control-grid,
+      .backup-action-grid,
+      .ticker-action-grid,
+      .admin-top-shortcuts-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .admin-stats-grid,
+      .admin-control-grid,
+      .backup-action-grid,
+      .ticker-action-grid,
+      .admin-top-shortcuts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .live-card.length-long {
+        grid-column: span 1;
+      }
+    }
+
+
+  
+
+    /* ACTS-ion 게이지 배틀 */
+    .gauge-admin-panel {
+      margin-bottom: 22px;
+      border: 2px solid #F97316;
+      background: linear-gradient(135deg, rgba(255,255,255,0.98), #FFF7ED);
+    }
+
+    .gauge-admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .gauge-admin-header h2 {
+      margin: 0;
+      color: #7C2D12;
+      letter-spacing: -0.04em;
+      font-size: 26px;
+    }
+
+    .gauge-admin-header p {
+      margin: 6px 0 0;
+      color: #6B7280;
+      font-weight: 750;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .gauge-admin-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.6fr;
+      gap: 12px;
+    }
+
+    .gauge-option-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .gauge-option-grid input {
+      padding: 13px 14px;
+      border-radius: 16px;
+      font-size: 15px;
+    }
+
+    .gauge-option-help {
+      margin: 8px 0 0;
+      color: #6B7280;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .gauge-start-btn {
+      background: linear-gradient(135deg, #F97316, #B91C1C);
+      box-shadow: 0 14px 30px rgba(249, 115, 22, 0.32);
+    }
+
+    .participant-gauge-panel {
+      margin-bottom: 22px;
+      border-radius: 30px;
+      padding: clamp(22px, 4vw, 34px);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(253,186,116,0.38), transparent 28%),
+        radial-gradient(circle at 90% 18%, rgba(34,197,94,0.28), transparent 26%),
+        linear-gradient(135deg, #431407 0%, #7C2D12 34%, #052E16 100%);
+      color: white;
+      box-shadow: 0 26px 70px rgba(67, 20, 7, 0.34);
+      overflow: hidden;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .participant-gauge-panel::before {
+      content: "";
+      position: absolute;
+      inset: -60px;
+      background:
+        radial-gradient(circle at 18% 88%, rgba(248,113,113,0.28), transparent 18%),
+        radial-gradient(circle at 48% 96%, rgba(251,146,60,0.32), transparent 18%),
+        radial-gradient(circle at 78% 88%, rgba(217,249,157,0.22), transparent 16%);
+      filter: blur(10px);
+      animation: gaugeFirePulse 2.2s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+
+    .participant-gauge-kicker,
+    .gauge-screen-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.24);
+      font-size: 13px;
+      font-weight: 1000;
+      letter-spacing: 0.03em;
+    }
+
+    .participant-gauge-title {
+      margin: 14px 0 8px;
+      font-size: clamp(30px, 5.2vw, 58px);
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+      font-weight: 1000;
+      word-break: keep-all;
+    }
+
+    .participant-gauge-subtext {
+      margin: 0 0 18px;
+      color: rgba(255,255,255,0.82);
+      font-weight: 750;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .gauge-dept-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .gauge-dept-btn {
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 18px;
+      padding: 15px 10px;
+      background: rgba(255,255,255,0.92);
+      color: #052E16;
+      font-size: 15px;
+      font-weight: 1000;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.16);
+    }
+
+    .gauge-dept-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px rgba(0,0,0,0.22);
+    }
+
+    .cheer-control-wrap {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 18px;
+    }
+
+    .cheer-selected-card {
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(10px);
+    }
+
+    .cheer-selected-card strong {
+      display: block;
+      margin-top: 6px;
+      color: #D9F99D;
+      font-size: clamp(26px, 4vw, 44px);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .cheer-up-btn {
+      border: none;
+      border-radius: 26px;
+      min-height: 128px;
+      background:
+        radial-gradient(circle at 50% 18%, #FEF3C7, transparent 27%),
+        linear-gradient(135deg, #F97316, #EF4444 48%, #16A34A);
+      color: white;
+      cursor: pointer;
+      font-size: clamp(24px, 4vw, 42px);
+      font-weight: 1000;
+      letter-spacing: -0.05em;
+      box-shadow: 0 20px 48px rgba(239, 68, 68, 0.38);
+      text-shadow: 0 4px 18px rgba(0,0,0,0.32);
+      animation: cheerButtonHeat 1.1s ease-in-out infinite alternate;
+    }
+
+    .cheer-up-btn:active {
+      transform: scale(0.96);
+      filter: brightness(1.16);
+    }
+
+    .gauge-mini-results {
+      display: grid;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .gauge-mini-row {
+      display: grid;
+      grid-template-columns: 132px 1fr 68px;
+      gap: 10px;
+      align-items: center;
+      font-weight: 900;
+    }
+
+    .gauge-mini-bar-wrap {
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      overflow: hidden;
+    }
+
+    .gauge-mini-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #D9F99D, #22C55E, #F97316);
+      transition: width 0.25s ease;
+    }
+
+    .gauge-change-btn {
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.78);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 850;
+      text-decoration: underline;
+      margin-top: 10px;
+      padding: 0;
+    }
+
+    .screen-shell.gauge-mode {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .screen-shell.gauge-mode .screen-header,
+    .screen-shell.gauge-mode .floating-label,
+    .screen-shell.gauge-mode .presented-footer,
+    .screen-shell.gauge-mode .screen-alert,
+    .screen-shell.gauge-mode .screen-ticker {
+      display: none !important;
+    }
+
+    .screen-shell.gauge-mode .wall-grid {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: calc(100vh - 72px);
+    }
+
+    .gauge-screen {
+      width: 100%;
+      height: 100%;
+      min-height: calc(100vh - 72px);
+      border-radius: inherit;
+      color: white;
+      padding: clamp(28px, 4vw, 58px);
+      background:
+        radial-gradient(circle at 10% 96%, rgba(239,68,68,0.54), transparent 24%),
+        radial-gradient(circle at 42% 102%, rgba(249,115,22,0.48), transparent 25%),
+        radial-gradient(circle at 84% 98%, rgba(217,249,157,0.30), transparent 22%),
+        linear-gradient(135deg, #160A03 0%, #431407 36%, #052E16 100%);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gauge-screen::before,
+    .gauge-screen::after {
+      content: "";
+      position: absolute;
+      left: -10%;
+      right: -10%;
+      bottom: -24%;
+      height: 48%;
+      background:
+        radial-gradient(ellipse at 10% 100%, rgba(239,68,68,0.76), transparent 34%),
+        radial-gradient(ellipse at 30% 100%, rgba(249,115,22,0.70), transparent 32%),
+        radial-gradient(ellipse at 52% 100%, rgba(253,224,71,0.46), transparent 30%),
+        radial-gradient(ellipse at 74% 100%, rgba(34,197,94,0.46), transparent 28%),
+        radial-gradient(ellipse at 92% 100%, rgba(249,115,22,0.62), transparent 30%);
+      filter: blur(12px);
+      opacity: 0.95;
+      animation: gaugeFlames 1.8s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+
+    .gauge-screen::after {
+      bottom: -30%;
+      opacity: 0.52;
+      animation-duration: 2.7s;
+      transform: scaleX(-1);
+    }
+
+    .gauge-screen-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .gauge-screen-title {
+      margin: 16px 0 0;
+      font-size: clamp(46px, 7.2vw, 112px);
+      line-height: 0.9;
+      letter-spacing: -0.075em;
+      font-weight: 1000;
+      word-break: keep-all;
+      text-shadow: 0 20px 60px rgba(0,0,0,0.42);
+    }
+
+    .gauge-screen-side {
+      display: grid;
+      grid-template-columns: 220px 170px;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .gauge-screen-timer-card,
+    .gauge-screen-qr-card {
+      border-radius: 30px;
+      padding: 22px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      box-shadow: 0 22px 60px rgba(0,0,0,0.25);
+    }
+
+    .gauge-screen-qr-card {
+      background: rgba(255,255,255,0.94);
+      color: #052E16;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 170px;
+      font-weight: 1000;
+      letter-spacing: -0.04em;
+    }
+
+    .gauge-screen-qr-card .qr-label {
+      font-size: 13px;
+      color: #7C2D12;
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .gauge-screen-qr-card .qr-placeholder {
+      width: 88px;
+      aspect-ratio: 1 / 1;
+      border-radius: 14px;
+      background:
+        linear-gradient(90deg, #052E16 8px, transparent 8px) 0 0 / 18px 18px,
+        linear-gradient(#052E16 8px, transparent 8px) 0 0 / 18px 18px,
+        #ffffff;
+      border: 6px solid #052E16;
+      box-shadow: inset 0 0 0 6px white;
+      margin-bottom: 10px;
+    }
+
+    .gauge-screen.result-mode .gauge-screen-kicker {
+      background: rgba(217,249,157,0.18);
+      border-color: rgba(217,249,157,0.42);
+    }
+
+    .gauge-screen.result-mode .gauge-screen-title::after {
+      content: "\A FINAL RESULT";
+      white-space: pre;
+      display: block;
+      margin-top: 14px;
+      color: #D9F99D;
+      font-size: clamp(22px, 2.4vw, 36px);
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+
+    .gauge-screen-timer-card span {
+      display: block;
+      color: rgba(255,255,255,0.76);
+      font-weight: 950;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .gauge-screen-timer {
+      color: #D9F99D;
+      font-size: clamp(36px, 4.8vw, 74px);
+      line-height: 1;
+      font-weight: 1000;
+      letter-spacing: -0.06em;
+    }
+
+    .gauge-screen-total {
+      margin-top: 10px;
+      color: rgba(255,255,255,0.76);
+      font-weight: 900;
+    }
+
+    .gauge-screen-bars {
+      display: grid;
+      gap: clamp(12px, 1.8vw, 22px);
+      margin-top: clamp(28px, 4vw, 54px);
+      position: relative;
+      z-index: 1;
+    }
+
+    .gauge-screen-row {
+      display: grid;
+      grid-template-columns: minmax(150px, 220px) 1fr minmax(100px, 140px);
+      gap: 18px;
+      align-items: center;
+      padding: clamp(12px, 1.4vw, 18px);
+      border-radius: 28px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.16);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+    }
+
+    .gauge-screen-row.leader {
+      background: linear-gradient(135deg, rgba(249,115,22,0.32), rgba(34,197,94,0.22));
+      border-color: rgba(217,249,157,0.44);
+      box-shadow: 0 0 40px rgba(249,115,22,0.20), 0 18px 45px rgba(0,0,0,0.22);
+    }
+
+    .gauge-screen-dept {
+      font-size: clamp(20px, 2.3vw, 34px);
+      font-weight: 1000;
+      letter-spacing: -0.05em;
+      word-break: keep-all;
+    }
+
+    .gauge-screen-bar-wrap {
+      height: clamp(34px, 4vw, 58px);
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.16);
+      position: relative;
+    }
+
+    .gauge-screen-bar {
+      height: 100%;
+      border-radius: 999px;
+      min-width: 0;
+      background:
+        radial-gradient(circle at 96% 50%, rgba(255,255,255,0.96), transparent 14%),
+        linear-gradient(90deg, #16A34A, #D9F99D 45%, #F97316 73%, #EF4444);
+      box-shadow: 0 0 24px rgba(249,115,22,0.55);
+      transition: width 0.22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gauge-screen-bar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.46), transparent);
+      animation: gaugeBarShine 1.2s linear infinite;
+    }
+
+    .gauge-screen-score {
+      text-align: right;
+      font-size: clamp(24px, 3vw, 46px);
+      font-weight: 1000;
+      color: #D9F99D;
+      letter-spacing: -0.06em;
+    }
+
+    .gauge-screen-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      color: rgba(255,255,255,0.78);
+      font-weight: 950;
+      position: relative;
+      z-index: 1;
+    }
+
+    .gauge-admin-results {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    @keyframes gaugeFirePulse {
+      from { transform: translateY(6px) scale(1); opacity: 0.74; }
+      to { transform: translateY(-8px) scale(1.04); opacity: 1; }
+    }
+
+    @keyframes cheerButtonHeat {
+      from { box-shadow: 0 20px 48px rgba(239, 68, 68, 0.32); }
+      to { box-shadow: 0 20px 64px rgba(249, 115, 22, 0.58), 0 0 34px rgba(217, 249, 157, 0.22); }
+    }
+
+    @keyframes gaugeFlames {
+      from { transform: translateY(16px) scaleY(0.96); }
+      to { transform: translateY(-12px) scaleY(1.08); }
+    }
+
+    @keyframes gaugeBarShine {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(100%); }
+    }
+
+    #screen.ratio-4-3 .screen-shell.gauge-mode {
+      padding: 0;
+      display: block;
+      aspect-ratio: 4 / 3;
+      width: min(100%, calc((100vh - 72px) * 4 / 3));
+      height: auto;
+      min-height: auto;
+      margin: 0 auto;
+    }
+
+    #screen.ratio-4-3 .screen-shell.gauge-mode .wall-grid,
+    #screen.ratio-4-3 .gauge-screen {
+      min-height: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    #screen.ratio-4-3 .gauge-screen {
+      border-radius: 0;
+      aspect-ratio: 4 / 3;
+      padding: clamp(18px, 2.2vw, 30px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 0;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(250px, 300px);
+      align-items: start;
+      gap: 14px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-header > div:first-child {
+      min-width: 0;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-kicker {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-title {
+      margin-top: 10px;
+      max-width: 100%;
+      font-size: clamp(32px, 4.3vw, 58px);
+      line-height: 0.92;
+      overflow-wrap: anywhere;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-side {
+      grid-template-columns: 1fr 0.86fr;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-timer-card,
+    #screen.ratio-4-3 .gauge-screen-qr-card {
+      min-width: 0;
+      padding: 14px;
+      border-radius: 22px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-qr-card {
+      min-height: 126px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-qr-card .qr-label {
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-qr-card .qr-placeholder {
+      width: 58px;
+      border-radius: 10px;
+      border-width: 5px;
+      margin-bottom: 8px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-qr-card div:last-child {
+      font-size: 13px;
+      line-height: 1.18;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-timer-card span {
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-timer {
+      font-size: clamp(34px, 4vw, 56px);
+    }
+
+    #screen.ratio-4-3 .gauge-screen-total {
+      font-size: 12px;
+      margin-top: 7px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-bars {
+      min-height: 0;
+      align-content: center;
+      gap: 9px;
+      margin-top: 18px;
+      overflow: hidden;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-row {
+      grid-template-columns: minmax(110px, 155px) minmax(0, 1fr) 74px;
+      gap: 10px;
+      padding: 9px 11px;
+      border-radius: 18px;
+      min-height: 52px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-bar-wrap {
+      height: 28px;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-dept {
+      font-size: clamp(15px, 1.6vw, 22px);
+      line-height: 1.1;
+      overflow-wrap: anywhere;
+    }
+
+    #screen.ratio-4-3 .gauge-screen-score {
+      font-size: clamp(20px, 2.1vw, 30px);
+    }
+
+    #screen.ratio-4-3 .gauge-screen-footer {
+      padding-top: 10px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .gauge-admin-grid,
+      .cheer-control-wrap,
+      .gauge-screen-side {
+        grid-template-columns: 1fr;
+      }
+
+      .gauge-option-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .gauge-dept-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .gauge-mini-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .gauge-screen-header,
+      .gauge-screen-footer {
+        flex-direction: column;
+      }
+
+      .gauge-screen-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .gauge-screen-score {
+        text-align: left;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <!-- 참여자 입력 화면 -->
+  <section id="submit" class="page active">
+    <div class="container">
+      <div id="participantGaugeBattleArea"></div>
+
+      <div class="hero">
+        <div class="badge">아신대학교 체육대회 2026</div>
+        <h1>ACTS CHEER-UP BOOTH</h1>
+        <p>오늘의 응원, 감사, 축복의 말을 남겨주세요.</p>
+      </div>
+
+      <div class="panel">
+        <div class="form-grid">
+          <div>
+            <label for="name">이름 / 닉네임</label>
+            <input id="name" type="text" placeholder="예: 신주영, 24학번 김OO" maxlength="20" />
+          </div>
+
+          <div>
+            <label for="department">소속</label>
+            <select id="department">
+              <option value="">소속을 선택해주세요</option>
+              <option>신학과</option>
+              <option>기독교상담학과</option>
+              <option>사회복지선교학과</option>
+              <option>기독교교육과미디어학과</option>
+              <option>AIGS</option>
+              <option>교수님</option>
+              <option>교직원</option>
+              <option>기타</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <label for="message">응원 메시지</label>
+          <textarea id="message" placeholder="예: 오늘 모두 다치지 말고 끝까지 즐겁게 뛰어요! ACTS 파이팅!" maxlength="120"></textarea>
+        </div>
+
+        <button class="submit-btn" onclick="submitMessage()">응원 메시지 보내기</button>
+
+        <div class="notice">
+          작성한 메시지는 관리자 확인 후 현장 스크린에 소개될 수 있습니다.
+          욕설, 비방, 개인정보가 포함된 내용은 노출되지 않습니다.
+        </div>
+
+        <div id="success" class="success">
+          메시지가 전송되었습니다! 관리자 승인 후 화면에 표시됩니다.
+        </div>
+      </div>
+
+      <div class="panel prediction-panel">
+        <h2>현재 진행중인 승부예측</h2>
+        <div id="participantPredictionArea"></div>
+      </div>
+      <div class="admin-entry-footer">
+        <button class="admin-entry-btn" onclick="showPage('admin')">관리자 모드</button>
+      </div>
+      <div class="presented-footer">Presented by 밀알 총학생회</div>
+    </div>
+  </section>
+
+  <!-- 관리자 화면 -->
+  <section id="admin" class="page">
+    <div class="container">
+      <div class="hero">
+        <div class="badge">ADMIN MODE</div>
+        <h1>관리자 모드</h1>
+        <p>비밀번호 입력 후 댓글 승인, 알림 송출, 승부예측 관리를 할 수 있습니다.</p>
+      </div>
+
+      <div id="adminLoginPanel" class="panel admin-auth-panel">
+        <label for="adminPassword">관리자 비밀번호</label>
+        <input id="adminPassword" type="password" placeholder="비밀번호를 입력해주세요" onkeydown="if(event.key === 'Enter') unlockAdminMode()" />
+        <button class="submit-btn" onclick="unlockAdminMode()">관리자 모드 입장</button>
+        <div class="notice">관리자 모드는 비밀번호 입력 후 사용할 수 있습니다.</div>
+      </div>
+
+      <div id="adminContent" class="admin-content">
+      <div class="panel admin-top-shortcuts">
+        <div class="admin-top-shortcuts-label">빠른 이동</div>
+        <div class="admin-top-shortcuts-grid">
+          <button class="control-primary" onclick="showPage('screen')">송출 화면 열기</button>
+          <button class="control-secondary" onclick="showPage('submit')">입력자 모드로 돌아가기</button>
+        </div>
+      </div>
+
+      <div class="admin-layout">
+        <div class="admin-box">
+          <h2>메시지 승인</h2>
+          <h3 style="margin:0 0 12px;color:#047857;letter-spacing:-0.03em;">승인 대기</h3>
+          <div id="pendingList" class="message-list"></div>
+        </div>
+
+        <div class="admin-box">
+          <div class="approved-preview-header">
+            <div>
+              <h2>승인 완료</h2>
+              <div class="approved-preview-caption">최근 승인된 메시지 5개만 표시됩니다.</div>
+            </div>
+            <button id="approvedAllToggleBtn" class="approved-all-toggle-btn" onclick="toggleApprovedAllPanel()">전체보기</button>
+          </div>
+          <div id="approvedPreviewList" class="message-list"></div>
+          <div id="approvedPreviewSummary" class="approved-list-summary"></div>
+        </div>
+      </div>
+
+      <div id="approvedAllPanel" class="panel approved-all-panel">
+        <div class="approved-all-header">
+          <div>
+            <h2>승인 완료 전체보기 <span id="approvedAllCount" class="approved-count-badge">0</span></h2>
+            <p>승인된 모든 메시지를 확인하고, 상단 고정 또는 삭제를 관리할 수 있습니다.</p>
+          </div>
+          <button class="approved-all-close-btn" onclick="toggleApprovedAllPanel(false)">전체보기 닫기</button>
+        </div>
+        <div id="approvedAllList" class="message-list approved-all-list"></div>
+      </div>
+
+      <div class="panel prediction-admin-panel">
+        <h2>승부예측 관리</h2>
+        <p class="prediction-subtext">제한시간 동안 진행할 승부예측을 만들 수 있습니다. 새 승부예측을 시작하면 기존 진행 중인 예측은 자동 종료됩니다.</p>
+        <div class="prediction-admin-grid">
+          <div>
+            <label for="predictionTitle">승부예측 제목</label>
+            <input id="predictionTitle" type="text" placeholder="예: 피구 결승 승리팀은?" maxlength="40" />
+          </div>
+          <div>
+            <label for="predictionOptionA">선택지 1</label>
+            <input id="predictionOptionA" type="text" placeholder="예: 신학과" maxlength="24" />
+          </div>
+          <div>
+            <label for="predictionOptionB">선택지 2</label>
+            <input id="predictionOptionB" type="text" placeholder="예: AIGS" maxlength="24" />
+          </div>
+          <div>
+            <label for="predictionMinutes">제한시간</label>
+            <input id="predictionMinutes" type="number" min="1" max="180" value="5" />
+          </div>
+        </div>
+        <div style="margin-top: 12px;">
+          <label for="predictionDescription">설명 / 안내 문구</label>
+          <input id="predictionDescription" type="text" placeholder="예: 제한시간 안에 한 번만 참여할 수 있고, 마감 전까지 수정/취소할 수 있습니다." maxlength="90" />
+        </div>
+        <div class="admin-notice-actions">
+          <button class="submit-btn" onclick="startPrediction()">승부예측 시작</button>
+          <button class="clear-notice-btn" onclick="endActivePrediction()">현재 승부예측 종료</button>
+          <button class="clear-notice-btn" onclick="hideLatestPredictionResult()">승부예측 결과 내리기</button>
+        </div>
+        <div id="currentPredictionStatus" class="current-notice-status">현재 진행 중인 승부예측이 없습니다.</div>
+      </div>
+
+      <div class="panel gauge-admin-panel">
+        <div class="gauge-admin-header">
+          <div>
+            <h2>ACTS-ion 게이지 배틀</h2>
+            <p>관리자가 시작하면 참여자 화면 상단에 학과 선택과 CHEER-UP 버튼이 표시되고, 송출 화면은 게이지 현황만 보여줍니다.</p>
+          </div>
+        </div>
+        <div class="gauge-admin-grid">
+          <div>
+            <label for="gaugeBattleTitle">게이지 배틀 제목</label>
+            <input id="gaugeBattleTitle" type="text" placeholder="예: ACTS-ion 게이지 배틀" maxlength="40" />
+          </div>
+          <div>
+            <label for="gaugeBattleMinutes">제한시간</label>
+            <input id="gaugeBattleMinutes" type="number" min="1" max="30" value="1" />
+          </div>
+        </div>
+        <div style="margin-top: 14px;">
+          <label>게이지 배틀 항목 직접 입력 <span style="color:#9CA3AF;font-size:13px;">최대 5개</span></label>
+          <div class="gauge-option-grid">
+            <input id="gaugeOption1" type="text" placeholder="예: 신학과" maxlength="24" value="신학과" />
+            <input id="gaugeOption2" type="text" placeholder="예: 기독교상담학과" maxlength="24" value="기독교상담학과" />
+            <input id="gaugeOption3" type="text" placeholder="예: 사회복지선교학과" maxlength="24" value="사회복지선교학과" />
+            <input id="gaugeOption4" type="text" placeholder="예: 기독교교육과미디어학과" maxlength="24" value="기독교교육과미디어학과" />
+            <input id="gaugeOption5" type="text" placeholder="예: AIGS" maxlength="24" value="AIGS" />
+          </div>
+          <p class="gauge-option-help">비워둔 칸은 제외됩니다. 최소 2개, 최대 5개 항목으로 게이지 배틀을 시작할 수 있습니다.</p>
+        </div>
+        <div class="admin-notice-actions">
+          <button class="submit-btn gauge-start-btn" onclick="startGaugeBattle()">게이지 배틀 시작</button>
+          <button class="clear-notice-btn" onclick="endActiveGaugeBattle()">현재 게이지 배틀 종료</button>
+        </div>
+        <div id="currentGaugeBattleStatus" class="current-notice-status">현재 진행 중인 게이지 배틀이 없습니다.</div>
+      </div>
+
+      <div class="panel admin-notice-panel">
+        <div class="notice-header">
+          <div>
+            <h2>알림 메시지 설정</h2>
+            <p>송출 화면 중앙 알림창과 하단 실시간 티커를 설정합니다.</p>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label for="adminNoticeTitle">송출 알림 제목</label>
+            <input id="adminNoticeTitle" type="text" placeholder="예: 경기 안내" maxlength="28" />
+          </div>
+          <div>
+            <label for="adminNoticeBody">송출 알림 내용</label>
+            <textarea id="adminNoticeBody" placeholder="예: 지금부터 줄다리기 결승전을 시작합니다!" maxlength="140"></textarea>
+          </div>
+        </div>
+        <div class="admin-notice-actions">
+          <button class="submit-btn" onclick="showBroadcastNotice()">알림 띄우기</button>
+          <button class="clear-notice-btn" onclick="clearBroadcastNotice()">알림 내리기</button>
+        </div>
+        <div id="currentNoticeStatus" class="current-notice-status">현재 송출 중인 알림이 없습니다.</div>
+
+        <div class="admin-subsection-title">하단 실시간 티커</div>
+        <p class="prediction-subtext">송출 화면 하단에 흐르는 문구를 직접 설정합니다.</p>
+        <div class="ticker-input-wrap">
+          <label for="adminTickerText">티커 문구</label>
+          <textarea id="adminTickerText" placeholder="예: 곧 줄다리기 결승전이 시작됩니다 · 선수들은 본부석 앞으로 모여주세요" maxlength="220"></textarea>
+        </div>
+        <div class="ticker-action-grid">
+          <button class="control-primary" onclick="showTicker()">티커 송출 / 수정</button>
+          <button class="control-secondary" onclick="clearTicker()">티커 내리기</button>
+          <button class="control-secondary" onclick="document.getElementById('adminTickerText').value = ''">입력칸 비우기</button>
+        </div>
+        <div id="tickerStatus" class="ticker-status">현재 송출 중인 티커가 없습니다.</div>
+      </div>
+
+      <div class="panel screen-control-panel">
+        <div class="screen-control-header">
+          <div>
+            <h2>송출 화면 컨트롤 버튼</h2>
+            <p>4:3 최적화, READY 화면 전환, 라이브 화면 복귀를 관리합니다.</p>
+          </div>
+        </div>
+        <div class="admin-control-grid">
+          <button id="screenRatioToggleBtn" class="control-primary" onclick="toggleScreenRatio43()">4:3 송출 최적화 켜기</button>
+          <button class="control-secondary" onclick="setScreenMode('ready')">READY 화면 띄우기</button>
+          <button class="control-secondary" onclick="setScreenMode('live')">메시지/승부예측 화면 복귀</button>
+        </div>
+        <div id="screenModeStatus" class="admin-control-status">송출 화면 상태를 불러오는 중입니다.</div>
+      </div>
+
+      <div id="adminStatsPanel" class="panel admin-dashboard-panel"></div>
+
+      <div class="panel admin-backup-panel">
+        <div class="backup-header">
+          <div>
+            <h2>데이터 백업 / 초기화</h2>
+            <p>리허설 데이터 정리, 행사 전 초기화, 백업 파일 저장 및 복원이 가능합니다.</p>
+          </div>
+        </div>
+        <div class="backup-action-grid">
+          <button class="control-primary" onclick="downloadBackupData()">JSON 백업 다운로드</button>
+          <button class="control-secondary" onclick="triggerRestoreBackup()">JSON 백업 복원</button>
+          <button class="control-danger" onclick="resetAllData()">전체 데이터 초기화</button>
+        </div>
+        <input id="backupRestoreInput" type="file" accept="application/json,.json" style="display:none" onchange="restoreBackupData(event)" />
+        <div class="backup-status">초기화는 메시지, 공지, 승부예측, 게이지 배틀, 티커, 송출 모드 데이터를 삭제합니다.</div>
+      </div>
+      </div>
+      <div class="presented-footer">Presented by 밀알 총학생회</div>
+    </div>
+  </section>
+
+  <!-- 송출 화면 -->
+  <section id="screen" class="page screen-page">
+    <div class="screen-shell">
+      <div class="screen-header">
+        <div class="screen-title">
+          <div class="badge">LIVE REACTION</div>
+          <h1>ACTS<br />CHEER-UP BOOTH</h1>
+          <p>QR을 찍고 아신대학교 체육대회 응원 메시지를 남겨주세요</p>
+        </div>
+
+        <div class="qr-box">
+          QR CODE<br />
+          INPUT<br />
+          PAGE
+        </div>
+      </div>
+
+      <div id="wallGrid" class="wall-grid"></div>
+
+      <div id="screenAlert" class="screen-alert" style="display: none;">
+        <div class="alert-label">NOTICE</div>
+        <h2 id="screenAlertTitle" class="alert-title"></h2>
+        <p id="screenAlertBody" class="alert-body"></p>
+      </div>
+
+
+      <div id="screenTicker" class="screen-ticker" style="display: none;">
+        <div id="screenTickerTrack" class="ticker-track"></div>
+      </div>
+      <div class="floating-label">ASIN UNIVERSITY SPORTS DAY</div>
+      <div class="presented-footer">Presented by 밀알 총학생회</div>
+    </div>
+  </section>
+
+  <div id="pastResultsModal" class="past-results-modal">
+    <div class="past-results-box">
+      <h2>지난 승부예측 결과</h2>
+      <div id="pastResultsList"></div>
+      <button class="close-modal-btn" onclick="closePastResults()">닫기</button>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "acts_cheer_up_booth_messages";
+    const NOTICE_KEY = "acts_cheer_up_booth_notice";
+    const PREDICTIONS_KEY = "acts_cheer_up_booth_predictions";
+    const VOTES_KEY = "acts_cheer_up_booth_prediction_votes";
+    const PARTICIPANT_KEY = "acts_cheer_up_booth_participant_id";
+    const ADMIN_PASSWORD = "0409";
+    const ADMIN_UNLOCK_KEY = "acts_cheer_up_booth_admin_unlocked";
+    const SCREEN_RATIO_KEY = "acts_cheer_up_booth_screen_ratio_4_3";
+    const SCREEN_MODE_KEY = "acts_cheer_up_booth_screen_mode";
+    const TICKER_KEY = "acts_cheer_up_booth_ticker";
+    const GAUGE_BATTLES_KEY = "acts_cheer_up_booth_gauge_battles";
+    const GAUGE_BOOSTS_KEY = "acts_cheer_up_booth_gauge_boosts";
+    const GAUGE_CHOICE_KEY = "acts_cheer_up_booth_gauge_choice";
+    const DEFAULT_GAUGE_OPTIONS = ["신학과", "기독교상담학과", "사회복지선교학과", "기독교교육과미디어학과", "AIGS"];
+    let isAdminUnlocked = sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "true";
+    let lastGaugeBoostAt = 0;
+
+    const bannedWords = [
+      "욕설",
+      "비방",
+      "바보",
+      "꺼져",
+      "죽어"
+    ];
+
+    const shownMessageIds = new Set();
+    let hasRenderedWallOnce = false;
+    let lastPlayedNoticeUpdatedAt = null;
+    let audioContext = null;
+
+    function getMessages() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    }
+
+    function saveMessages(messages) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      renderAll();
+    }
+
+    function getPredictions() {
+      return JSON.parse(localStorage.getItem(PREDICTIONS_KEY) || "[]");
+    }
+
+    function savePredictions(predictions, shouldRender = true) {
+      localStorage.setItem(PREDICTIONS_KEY, JSON.stringify(predictions));
+      if (shouldRender) renderAll();
+    }
+
+    function getVotes() {
+      return JSON.parse(localStorage.getItem(VOTES_KEY) || "{}");
+    }
+
+    function saveVotes(votes) {
+      localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
+      renderAll();
+    }
+
+    function isScreenRatio43() {
+      return localStorage.getItem(SCREEN_RATIO_KEY) === "true";
+    }
+
+    function getScreenMode() {
+      return localStorage.getItem(SCREEN_MODE_KEY) || "live";
+    }
+
+    function getTicker() {
+      return JSON.parse(localStorage.getItem(TICKER_KEY) || '{"active":false,"text":"","updatedAt":""}');
+    }
+
+    function saveTicker(ticker) {
+      localStorage.setItem(TICKER_KEY, JSON.stringify(ticker));
+      renderAll();
+    }
+
+    function getGaugeBattles() {
+      return JSON.parse(localStorage.getItem(GAUGE_BATTLES_KEY) || "[]");
+    }
+
+    function saveGaugeBattles(battles, shouldRender = true) {
+      localStorage.setItem(GAUGE_BATTLES_KEY, JSON.stringify(battles));
+      if (shouldRender) renderAll();
+    }
+
+    function getGaugeBoosts() {
+      return JSON.parse(localStorage.getItem(GAUGE_BOOSTS_KEY) || "{}");
+    }
+
+    function saveGaugeBoosts(boosts) {
+      localStorage.setItem(GAUGE_BOOSTS_KEY, JSON.stringify(boosts));
+      renderAll();
+    }
+
+    function getGaugeChoices() {
+      return JSON.parse(localStorage.getItem(GAUGE_CHOICE_KEY) || "{}");
+    }
+
+    function getGaugeChoice(battleId) {
+      return getGaugeChoices()[battleId] || "";
+    }
+
+    function setGaugeChoice(battleId, optionName) {
+      const choices = getGaugeChoices();
+      choices[battleId] = String(optionName || "").trim();
+      localStorage.setItem(GAUGE_CHOICE_KEY, JSON.stringify(choices));
+      renderAll();
+    }
+
+    function clearGaugeChoice(battleId) {
+      const choices = getGaugeChoices();
+      delete choices[battleId];
+      localStorage.setItem(GAUGE_CHOICE_KEY, JSON.stringify(choices));
+      renderAll();
+    }
+
+    function getActiveGaugeBattle() {
+      return getGaugeBattles().find(battle => battle.status === "active") || null;
+    }
+
+    function getGaugeOptions(battle) {
+      const rawOptions = Array.isArray(battle?.options) ? battle.options : Array.isArray(battle?.departments) ? battle.departments : DEFAULT_GAUGE_OPTIONS;
+      const uniqueOptions = [];
+      rawOptions.forEach(option => {
+        const value = String(option || "").trim();
+        if (value && !uniqueOptions.includes(value) && uniqueOptions.length < 5) uniqueOptions.push(value);
+      });
+      return uniqueOptions.length ? uniqueOptions : DEFAULT_GAUGE_OPTIONS;
+    }
+
+    function getVisibleGaugeResultBattle() {
+      const now = Date.now();
+      return getGaugeBattles()
+        .filter(battle => battle.status === "ended" && battle.resultUntil && new Date(battle.resultUntil).getTime() > now)
+        .sort((a, b) => new Date(b.endedAt || b.endAt) - new Date(a.endedAt || a.endAt))[0] || null;
+    }
+
+    function getGaugeStats(battle) {
+      const options = getGaugeOptions(battle);
+      const battleBoosts = getGaugeBoosts()[battle.id] || {};
+      const counts = options.map(option => Number(battleBoosts[option] || 0));
+      const total = counts.reduce((sum, count) => sum + count, 0);
+      const maxCount = Math.max(1, ...counts);
+      const percentages = counts.map(count => Math.round((count / maxCount) * 100));
+      const leaderIndex = counts.reduce((bestIndex, count, index) => count > counts[bestIndex] ? index : bestIndex, 0);
+      return { options, counts, total, percentages, leaderIndex, maxCount };
+    }
+
+    function applyScreenRatioClass() {
+      const screenPage = document.getElementById("screen");
+      if (screenPage) screenPage.classList.toggle("ratio-4-3", isScreenRatio43());
+
+      const toggleBtn = document.getElementById("screenRatioToggleBtn");
+      if (toggleBtn) {
+        toggleBtn.textContent = isScreenRatio43() ? "4:3 송출 최적화 끄기" : "4:3 송출 최적화 켜기";
+      }
+    }
+
+    function applyScreenModeClass() {
+      const screenShell = document.querySelector("#screen .screen-shell");
+      if (!screenShell) return;
+      const isReadyMode = getScreenMode() === "ready";
+      screenShell.classList.toggle("ready-mode", isReadyMode);
+      screenShell.classList.toggle("gauge-mode", !isReadyMode && (!!getActiveGaugeBattle() || !!getVisibleGaugeResultBattle()));
+    }
+
+    function toggleScreenRatio43() {
+      if (!requireAdminMode()) return;
+      localStorage.setItem(SCREEN_RATIO_KEY, isScreenRatio43() ? "false" : "true");
+      applyScreenRatioClass();
+      renderAll();
+    }
+
+    function setScreenMode(mode) {
+      if (!requireAdminMode()) return;
+      const nextMode = mode === "ready" ? "ready" : "live";
+      localStorage.setItem(SCREEN_MODE_KEY, nextMode);
+      renderAll();
+    }
+
+    function formatCurrentTime() {
+      return new Date().toLocaleTimeString("ko-KR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      });
+    }
+
+    function renderReadyScreen() {
+      return `
+        <div class="ready-screen">
+          <div class="ready-content">
+            <h2>READY, GET SET ACTS-ion</h2>
+            <div class="ready-time">현재 시간 ${formatCurrentTime()}</div>
+          </div>
+          <div class="ready-presented-footer">Presented by 밀알 총학생회</div>
+        </div>
+      `;
+    }
+
+    function getMessageLengthClass(message) {
+      const length = Array.from(message || "").length;
+      if (length <= 34) return "length-short";
+      if (length <= 78) return "length-medium";
+      return "length-long";
+    }
+
+
+    function getParticipantId() {
+      let id = localStorage.getItem(PARTICIPANT_KEY);
+      if (!id) {
+        id = "participant_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+        localStorage.setItem(PARTICIPANT_KEY, id);
+      }
+      return id;
+    }
+
+    function getNotice() {
+      const notice = JSON.parse(localStorage.getItem(NOTICE_KEY) || '{"active":false,"title":"","body":""}');
+      if (notice.text && !notice.title && !notice.body) {
+        return {
+          active: notice.active,
+          title: "알림",
+          body: notice.text,
+          updatedAt: notice.updatedAt || ""
+        };
+      }
+      return notice;
+    }
+
+    function saveNotice(notice) {
+      localStorage.setItem(NOTICE_KEY, JSON.stringify(notice));
+      renderAll();
+    }
+
+    function normalizeDepartment(department) {
+      if (department === "기독교교육상담학과") return "기독교상담학과";
+      if (department === "사회복지학과") return "사회복지선교학과";
+      return department;
+    }
+
+    function getDeptClass(department) {
+      const normalized = normalizeDepartment(department);
+      if (normalized === "신학과") return "dept-red";
+      if (normalized === "사회복지선교학과") return "dept-green";
+      if (normalized === "기독교상담학과") return "dept-pink";
+      if (normalized === "AIGS") return "dept-purple";
+      if (normalized === "교수님" || normalized === "교직원") return "dept-gray";
+      if (normalized === "기독교교육과미디어학과") return "dept-blue";
+      return "dept-default";
+    }
+
+    function showPage(pageId) {
+      if (pageId === "screen" && !isAdminUnlocked) {
+        alert("송출 화면은 관리자 모드 입장 후 열 수 있습니다.");
+        pageId = "admin";
+      }
+
+      document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+      const targetPage = document.getElementById(pageId);
+      if (targetPage) targetPage.classList.add("active");
+
+      updateAdminModeVisibility();
+      renderAll();
+    }
+
+    function updateAdminModeVisibility() {
+      const loginPanel = document.getElementById("adminLoginPanel");
+      const adminContent = document.getElementById("adminContent");
+      if (!loginPanel || !adminContent) return;
+
+      if (isAdminUnlocked) {
+        loginPanel.style.display = "none";
+        adminContent.classList.add("active");
+      } else {
+        loginPanel.style.display = "block";
+        adminContent.classList.remove("active");
+      }
+    }
+
+    function unlockAdminMode() {
+      const input = document.getElementById("adminPassword");
+      const password = input ? input.value.trim() : "";
+
+      if (password !== ADMIN_PASSWORD) {
+        alert("관리자 비밀번호가 올바르지 않습니다.");
+        if (input) input.value = "";
+        return;
+      }
+
+      isAdminUnlocked = true;
+      sessionStorage.setItem(ADMIN_UNLOCK_KEY, "true");
+      updateAdminModeVisibility();
+      renderAll();
+    }
+
+    function requireAdminMode() {
+      if (isAdminUnlocked) return true;
+      alert("관리자 비밀번호 입력 후 사용할 수 있습니다.");
+      return false;
+    }
+
+    function containsBannedWord(text) {
+      return bannedWords.some(word => text.includes(word));
+    }
+
+    function submitMessage() {
+      const name = document.getElementById("name").value.trim();
+      const department = document.getElementById("department").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!name || !department || !message) {
+        alert("이름, 소속, 메시지를 모두 입력해주세요.");
+        return;
+      }
+
+      if (containsBannedWord(message)) {
+        alert("부적절한 표현이 포함되어 있어 전송할 수 없습니다.");
+        return;
+      }
+
+      const messages = getMessages();
+      const newMessage = {
+        id: Date.now(),
+        name,
+        department: normalizeDepartment(department),
+        message,
+        status: "pending",
+        pinned: false,
+        createdAt: new Date().toISOString()
+      };
+
+      messages.unshift(newMessage);
+      saveMessages(messages);
+
+      document.getElementById("name").value = "";
+      document.getElementById("department").value = "";
+      document.getElementById("message").value = "";
+
+      const success = document.getElementById("success");
+      success.style.display = "block";
+      setTimeout(() => success.style.display = "none", 3000);
+    }
+
+    function approveMessage(id) {
+      if (!requireAdminMode()) return;
+      const messages = getMessages().map(msg => msg.id === id ? { ...msg, status: "approved" } : msg);
+      saveMessages(messages);
+    }
+
+    function deleteMessage(id) {
+      if (!requireAdminMode()) return;
+      const messages = getMessages().filter(msg => msg.id !== id);
+      saveMessages(messages);
+    }
+
+    function showBroadcastNotice() {
+      if (!requireAdminMode()) return;
+      const noticeTitleInput = document.getElementById("adminNoticeTitle");
+      const noticeBodyInput = document.getElementById("adminNoticeBody");
+      const title = noticeTitleInput.value.trim();
+      const body = noticeBodyInput.value.trim();
+
+      if (!title || !body) {
+        alert("송출할 알림 제목과 내용을 모두 입력해주세요.");
+        return;
+      }
+
+      saveNotice({ active: true, title, body, updatedAt: new Date().toISOString() });
+    }
+
+    function clearBroadcastNotice() {
+      if (!requireAdminMode()) return;
+      saveNotice({ active: false, title: "", body: "", updatedAt: new Date().toISOString() });
+    }
+
+    function togglePin(id) {
+      if (!requireAdminMode()) return;
+      const messages = getMessages();
+      const target = messages.find(msg => msg.id === id);
+      const shouldPin = target ? !target.pinned : false;
+      const updatedMessages = messages.map(msg => ({ ...msg, pinned: msg.id === id ? shouldPin : false }));
+      saveMessages(updatedMessages);
+    }
+
+    function getActivePrediction() {
+      return getPredictions().find(prediction => prediction.status === "active") || null;
+    }
+
+    function getLatestEndedPrediction() {
+      return getPredictions()
+        .filter(prediction => prediction.status === "ended" && !prediction.hiddenOnScreen)
+        .sort((a, b) => new Date(b.endedAt || b.endAt) - new Date(a.endedAt || a.endAt))[0] || null;
+    }
+
+    function startPrediction() {
+      if (!requireAdminMode()) return;
+      const title = document.getElementById("predictionTitle").value.trim();
+      const description = document.getElementById("predictionDescription").value.trim();
+      const optionA = document.getElementById("predictionOptionA").value.trim();
+      const optionB = document.getElementById("predictionOptionB").value.trim();
+      const minutes = Number(document.getElementById("predictionMinutes").value);
+
+      if (!title || !optionA || !optionB || !minutes || minutes < 1) {
+        alert("제목, 선택지 2개, 제한시간을 모두 입력해주세요.");
+        return;
+      }
+
+      const now = new Date();
+      const endAt = new Date(now.getTime() + minutes * 60 * 1000);
+      const predictions = getPredictions().map(prediction => {
+        if (prediction.status === "active") {
+          return { ...prediction, status: "ended", endedAt: now.toISOString(), closedReason: "new_prediction", hiddenOnScreen: false };
+        }
+        return prediction;
+      });
+
+      predictions.unshift({
+        id: Date.now(),
+        title,
+        description,
+        options: [optionA, optionB],
+        status: "active",
+        createdAt: now.toISOString(),
+        endAt: endAt.toISOString(),
+        endedAt: null,
+        hiddenOnScreen: false
+      });
+
+      savePredictions(predictions);
+      document.getElementById("predictionTitle").value = "";
+      document.getElementById("predictionDescription").value = "";
+      document.getElementById("predictionOptionA").value = "";
+      document.getElementById("predictionOptionB").value = "";
+    }
+
+    function endActivePrediction() {
+      if (!requireAdminMode()) return;
+      const activePrediction = getActivePrediction();
+      if (!activePrediction) {
+        alert("현재 진행 중인 승부예측이 없습니다.");
+        return;
+      }
+      endPrediction(activePrediction.id, true);
+    }
+
+    function endPrediction(id, shouldRender = true) {
+      const now = new Date().toISOString();
+      const predictions = getPredictions().map(prediction => {
+        if (prediction.id === id && prediction.status === "active") {
+          return { ...prediction, status: "ended", endedAt: now, hiddenOnScreen: false };
+        }
+        return prediction;
+      });
+      savePredictions(predictions, shouldRender);
+    }
+
+    function hideLatestPredictionResult() {
+      if (!requireAdminMode()) return;
+      const latestEndedPrediction = getLatestEndedPrediction();
+
+      if (!latestEndedPrediction) {
+        alert("현재 송출 중인 승부예측 결과가 없습니다.");
+        return;
+      }
+
+      const predictions = getPredictions().map(prediction => {
+        if (prediction.id === latestEndedPrediction.id) {
+          return { ...prediction, hiddenOnScreen: true };
+        }
+        return prediction;
+      });
+
+      savePredictions(predictions);
+    }
+
+    function checkPredictionExpiration() {
+      const activePrediction = getActivePrediction();
+      if (!activePrediction) return;
+      if (new Date(activePrediction.endAt).getTime() <= Date.now()) {
+        endPrediction(activePrediction.id, false);
+      }
+    }
+
+    function votePrediction(predictionId, optionIndex) {
+      const prediction = getPredictions().find(item => item.id === predictionId);
+      if (!prediction || prediction.status !== "active" || new Date(prediction.endAt).getTime() <= Date.now()) {
+        alert("이미 종료된 승부예측입니다.");
+        checkPredictionExpiration();
+        renderAll();
+        return;
+      }
+
+      const voterId = getParticipantId();
+      const votes = getVotes();
+      votes[predictionId] = votes[predictionId] || {};
+      votes[predictionId][voterId] = { optionIndex, updatedAt: new Date().toISOString() };
+      saveVotes(votes);
+    }
+
+    function cancelPredictionVote(predictionId) {
+      const votes = getVotes();
+      const voterId = getParticipantId();
+      if (votes[predictionId] && votes[predictionId][voterId]) {
+        delete votes[predictionId][voterId];
+      }
+      saveVotes(votes);
+    }
+
+    function getVoteStats(prediction) {
+      const predictionVotes = getVotes()[prediction.id] || {};
+      const counts = prediction.options.map(() => 0);
+      Object.values(predictionVotes).forEach(vote => {
+        if (counts[vote.optionIndex] !== undefined) counts[vote.optionIndex] += 1;
+      });
+      const total = counts.reduce((sum, count) => sum + count, 0);
+      const percentages = counts.map(count => total ? Math.round((count / total) * 100) : 0);
+      return { counts, total, percentages };
+    }
+
+    function formatRemaining(endAt) {
+      const diff = Math.max(0, new Date(endAt).getTime() - Date.now());
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function formatRemainingSeconds(endAt) {
+      const diff = Math.max(0, new Date(endAt).getTime() - Date.now());
+      return String(Math.ceil(diff / 1000));
+    }
+
+    function renderParticipantPrediction() {
+      const area = document.getElementById("participantPredictionArea");
+      if (!area) return;
+      const activePrediction = getActivePrediction();
+
+      if (!activePrediction) {
+        area.innerHTML = `
+          <div class="prediction-empty">
+            현재 진행중인 승부예측이 없습니다.<br />
+            <button class="past-result-btn" onclick="openPastResults()">지난 승부예측 결과보기</button>
+          </div>
+        `;
+        return;
+      }
+
+      const voterId = getParticipantId();
+      const votes = getVotes();
+      const currentVote = votes[activePrediction.id]?.[voterId];
+      const stats = getVoteStats(activePrediction);
+
+      area.innerHTML = `
+        <div class="prediction-countdown">남은 시간 ${formatRemaining(activePrediction.endAt)}</div>
+        <h2>${escapeHtml(activePrediction.title)}</h2>
+        <p class="prediction-subtext">${escapeHtml(activePrediction.description || "마감 전까지 선택을 수정하거나 취소할 수 있습니다.")}</p>
+        <div class="prediction-options">
+          ${activePrediction.options.map((option, index) => `
+            <button class="prediction-option-btn ${currentVote?.optionIndex === index ? "selected" : ""}" onclick="votePrediction(${activePrediction.id}, ${index})">
+              ${escapeHtml(option)} ${currentVote?.optionIndex === index ? "✓" : ""}
+            </button>
+          `).join("")}
+        </div>
+        ${currentVote ? `<button class="prediction-cancel-btn" onclick="cancelPredictionVote(${activePrediction.id})">내 선택 취소하기</button>` : ""}
+        <div class="prediction-result-card">
+          ${renderResultRows(activePrediction, stats, false)}
+        </div>
+      `;
+    }
+
+    function renderResultRows(prediction, stats, screenMode) {
+      const rowClass = screenMode ? "screen-result-row" : "result-row";
+      const labelClass = screenMode ? "screen-result-label" : "result-label";
+      const wrapClass = screenMode ? "screen-result-bar-wrap" : "result-bar-wrap";
+      const barClass = screenMode ? "screen-result-bar" : "result-bar";
+      const percentClass = screenMode ? "screen-result-percent" : "result-percent";
+
+      return prediction.options.map((option, index) => `
+        <div class="${rowClass}">
+          <div class="${labelClass}">${escapeHtml(option)}</div>
+          <div class="${wrapClass}"><div class="${barClass}" style="width:${stats.percentages[index]}%"></div></div>
+          <div class="${percentClass}">${stats.percentages[index]}%</div>
+        </div>
+      `).join("");
+    }
+
+    function renderPastResults() {
+      const list = document.getElementById("pastResultsList");
+      if (!list) return;
+      const endedPredictions = getPredictions()
+        .filter(prediction => prediction.status === "ended")
+        .sort((a, b) => new Date(b.endedAt || b.endAt) - new Date(a.endedAt || a.endAt));
+
+      if (!endedPredictions.length) {
+        list.innerHTML = `<div class="prediction-empty">아직 종료된 승부예측이 없습니다.</div>`;
+        return;
+      }
+
+      list.innerHTML = endedPredictions.map(prediction => {
+        const stats = getVoteStats(prediction);
+        return `
+          <div class="past-result-item">
+            <h3 style="margin:0 0 6px;color:#052E16;">${escapeHtml(prediction.title)}</h3>
+            <p style="margin:0 0 12px;color:#6B7280;font-weight:700;">총 ${stats.total}명 참여</p>
+            <div class="prediction-result-card">${renderResultRows(prediction, stats, false)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function openPastResults() {
+      renderPastResults();
+      document.getElementById("pastResultsModal").classList.add("active");
+    }
+
+    function closePastResults() {
+      document.getElementById("pastResultsModal").classList.remove("active");
+    }
+
+
+
+    function renderAdminDashboardStats() {
+      const panel = document.getElementById("adminStatsPanel");
+      if (!panel) return;
+
+      const messages = getMessages();
+      const pendingCount = messages.filter(msg => msg.status === "pending").length;
+      const approvedCount = messages.filter(msg => msg.status === "approved").length;
+      const activePrediction = getActivePrediction();
+      const latestEndedPrediction = getLatestEndedPrediction();
+      const predictionForStats = activePrediction || latestEndedPrediction;
+      const predictionStats = predictionForStats ? getVoteStats(predictionForStats) : null;
+      const ticker = getTicker();
+      const activeGaugeBattle = getActiveGaugeBattle();
+      const latestGaugeBattle = getGaugeBattles().filter(battle => battle.status === "ended").sort((a, b) => new Date(b.endedAt || b.endAt) - new Date(a.endedAt || a.endAt))[0];
+      const gaugeStats = activeGaugeBattle ? getGaugeStats(activeGaugeBattle) : latestGaugeBattle ? getGaugeStats(latestGaugeBattle) : null;
+
+      const deptCounts = messages
+        .filter(msg => msg.status === "approved")
+        .reduce((acc, msg) => {
+          const department = normalizeDepartment(msg.department || "기타");
+          acc[department] = (acc[department] || 0) + 1;
+          return acc;
+        }, {});
+
+      const topDepartments = Object.entries(deptCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([department, count]) => `${escapeHtml(department)} ${count}개`)
+        .join(" · ") || "아직 승인된 메시지가 없습니다";
+
+      panel.innerHTML = `
+        <div class="admin-dashboard-header">
+          <div>
+            <h2>관리자 대시보드</h2>
+            <p>현장 운영에 필요한 핵심 상태를 한눈에 확인합니다.</p>
+          </div>
+        </div>
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">승인 대기</div>
+            <div class="admin-stat-value">${pendingCount}</div>
+            <div class="admin-stat-desc">검토가 필요한 메시지</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">승인 완료</div>
+            <div class="admin-stat-value">${approvedCount}</div>
+            <div class="admin-stat-desc">송출 가능한 메시지</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">승부예측 참여</div>
+            <div class="admin-stat-value">${predictionStats ? predictionStats.total : 0}</div>
+            <div class="admin-stat-desc">${activePrediction ? "현재 진행 중" : latestEndedPrediction ? "최근 종료 결과" : "진행 이력 없음"}</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">게이지 배틀</div>
+            <div class="admin-stat-value">${gaugeStats ? gaugeStats.total : 0}</div>
+            <div class="admin-stat-desc">${activeGaugeBattle ? "현재 진행 중" : latestGaugeBattle ? "최근 종료 BOOST" : "진행 이력 없음"}</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">송출 상태</div>
+            <div class="admin-stat-value">${getScreenMode() === "ready" ? "READY" : activeGaugeBattle ? "GAUGE" : "LIVE"}</div>
+            <div class="admin-stat-desc">${isScreenRatio43() ? "4:3 최적화 ON" : "일반 화면"} · 티커 ${ticker.active ? "ON" : "OFF"}</div>
+          </div>
+        </div>
+        <div class="admin-control-status">학과별 승인 메시지 TOP: <b>${topDepartments}</b></div>
+      `;
+    }
+
+    function renderScreenControlStatus() {
+      const status = document.getElementById("screenModeStatus");
+      if (!status) return;
+      status.innerHTML = `현재 송출 모드: <b>${getScreenMode() === "ready" ? "READY 화면" : "LIVE 화면"}</b> · 화면 비율: <b>${isScreenRatio43() ? "4:3 최적화" : "일반 반응형"}</b>`;
+    }
+
+    function showTicker() {
+      if (!requireAdminMode()) return;
+      const input = document.getElementById("adminTickerText");
+      const text = input ? input.value.trim() : "";
+
+      if (!text) {
+        alert("송출할 티커 문구를 입력해주세요.");
+        return;
+      }
+
+      saveTicker({ active: true, text, updatedAt: new Date().toISOString() });
+    }
+
+    function clearTicker() {
+      if (!requireAdminMode()) return;
+      saveTicker({ active: false, text: "", updatedAt: new Date().toISOString() });
+    }
+
+    function renderAdminTickerStatus() {
+      const ticker = getTicker();
+      const status = document.getElementById("tickerStatus");
+      const input = document.getElementById("adminTickerText");
+
+      if (input && document.activeElement !== input) {
+        input.value = ticker.text || "";
+      }
+
+      if (!status) return;
+      status.innerHTML = ticker.active && ticker.text
+        ? `현재 송출 중: <b>${escapeHtml(ticker.text)}</b>`
+        : "현재 송출 중인 티커가 없습니다.";
+    }
+
+    function renderScreenTicker() {
+      const ticker = getTicker();
+      const tickerWrap = document.getElementById("screenTicker");
+      const tickerTrack = document.getElementById("screenTickerTrack");
+      const screenShell = document.querySelector("#screen .screen-shell");
+      if (!tickerWrap || !tickerTrack) return;
+
+      if (ticker.active && ticker.text) {
+        const safeText = escapeHtml(ticker.text);
+        tickerTrack.innerHTML = `${safeText} &nbsp; · &nbsp; ${safeText} &nbsp; · &nbsp; ${safeText}`;
+        tickerWrap.style.display = "flex";
+        if (screenShell) screenShell.classList.add("has-ticker");
+      } else {
+        tickerTrack.textContent = "";
+        tickerWrap.style.display = "none";
+        if (screenShell) screenShell.classList.remove("has-ticker");
+      }
+    }
+
+    function downloadBackupData() {
+      if (!requireAdminMode()) return;
+      const backup = {
+        app: "ACTS CHEER-UP BOOTH",
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        messages: getMessages(),
+        notice: getNotice(),
+        predictions: getPredictions(),
+        votes: getVotes(),
+        gaugeBattles: getGaugeBattles(),
+        gaugeBoosts: getGaugeBoosts(),
+        screen: {
+          ratio43: isScreenRatio43(),
+          mode: getScreenMode()
+        },
+        ticker: getTicker()
+      };
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, "-");
+      link.href = url;
+      link.download = `acts-cheer-up-booth-backup-${timestamp}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function triggerRestoreBackup() {
+      if (!requireAdminMode()) return;
+      const input = document.getElementById("backupRestoreInput");
+      if (input) input.click();
+    }
+
+    function restoreBackupData(event) {
+      if (!requireAdminMode()) return;
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!confirm("현재 데이터를 백업 파일 내용으로 덮어씁니다. 계속할까요?")) {
+        event.target.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.isArray(data.messages) ? data.messages : []));
+          localStorage.setItem(NOTICE_KEY, JSON.stringify(data.notice || { active: false, title: "", body: "" }));
+          localStorage.setItem(PREDICTIONS_KEY, JSON.stringify(Array.isArray(data.predictions) ? data.predictions : []));
+          localStorage.setItem(VOTES_KEY, JSON.stringify(data.votes || {}));
+          localStorage.setItem(GAUGE_BATTLES_KEY, JSON.stringify(Array.isArray(data.gaugeBattles) ? data.gaugeBattles : []));
+          localStorage.setItem(GAUGE_BOOSTS_KEY, JSON.stringify(data.gaugeBoosts || {}));
+          localStorage.setItem(TICKER_KEY, JSON.stringify(data.ticker || { active: false, text: "", updatedAt: "" }));
+          localStorage.setItem(SCREEN_RATIO_KEY, data.screen?.ratio43 ? "true" : "false");
+          localStorage.setItem(SCREEN_MODE_KEY, data.screen?.mode === "ready" ? "ready" : "live");
+          shownMessageIds.clear();
+          hasRenderedWallOnce = false;
+          lastPlayedNoticeUpdatedAt = null;
+          applyScreenRatioClass();
+          renderAll();
+          alert("백업 데이터를 복원했습니다.");
+        } catch (error) {
+          alert("백업 파일을 읽을 수 없습니다. JSON 파일 형식을 확인해주세요.");
+          console.error(error);
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetAllData() {
+      if (!requireAdminMode()) return;
+      if (!confirm("모든 메시지, 공지, 승부예측, 게이지 배틀, 티커, 송출 설정을 초기화할까요? 이 작업은 되돌릴 수 없습니다.")) return;
+
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(NOTICE_KEY);
+      localStorage.removeItem(PREDICTIONS_KEY);
+      localStorage.removeItem(VOTES_KEY);
+      localStorage.removeItem(GAUGE_BATTLES_KEY);
+      localStorage.removeItem(GAUGE_BOOSTS_KEY);
+      localStorage.removeItem(GAUGE_CHOICE_KEY);
+      localStorage.removeItem(TICKER_KEY);
+      localStorage.setItem(SCREEN_RATIO_KEY, "false");
+      localStorage.setItem(SCREEN_MODE_KEY, "live");
+      shownMessageIds.clear();
+      hasRenderedWallOnce = false;
+      lastPlayedNoticeUpdatedAt = null;
+      applyScreenRatioClass();
+      renderAll();
+      alert("전체 데이터가 초기화되었습니다.");
+    }
+
+
+    function getGaugeOptionInputs() {
+      return [1, 2, 3, 4, 5]
+        .map(index => document.getElementById(`gaugeOption${index}`)?.value.trim() || "")
+        .filter(Boolean)
+        .filter((option, index, options) => options.indexOf(option) === index)
+        .slice(0, 5);
+    }
+
+    function startGaugeBattle() {
+      if (!requireAdminMode()) return;
+      const titleInput = document.getElementById("gaugeBattleTitle");
+      const minutesInput = document.getElementById("gaugeBattleMinutes");
+      const title = (titleInput?.value || "").trim() || "ACTS-ion 게이지 배틀";
+      const minutes = Number(minutesInput?.value || 1);
+      const options = getGaugeOptionInputs();
+
+      if (!minutes || minutes < 1 || minutes > 30) {
+        alert("게이지 배틀 제한시간은 1분 이상 30분 이하로 입력해주세요.");
+        return;
+      }
+
+      if (options.length < 2) {
+        alert("게이지 배틀 항목은 최소 2개 이상 입력해주세요.");
+        return;
+      }
+
+      const now = new Date();
+      const endAt = new Date(now.getTime() + minutes * 60 * 1000);
+      const resultUntil = new Date(now.getTime() + 10 * 1000).toISOString();
+      const battles = getGaugeBattles().map(battle => {
+        if (battle.status === "active") {
+          return { ...battle, status: "ended", endedAt: now.toISOString(), resultUntil, closedReason: "new_gauge_battle" };
+        }
+        return battle;
+      });
+
+      const newBattle = {
+        id: Date.now(),
+        title,
+        options,
+        status: "active",
+        createdAt: now.toISOString(),
+        endAt: endAt.toISOString(),
+        endedAt: null,
+        resultUntil: null
+      };
+
+      battles.unshift(newBattle);
+      localStorage.setItem(SCREEN_MODE_KEY, "live");
+      saveGaugeBattles(battles);
+      if (titleInput) titleInput.value = "";
+    }
+
+    function endActiveGaugeBattle() {
+      if (!requireAdminMode()) return;
+      const activeBattle = getActiveGaugeBattle();
+      if (!activeBattle) {
+        alert("현재 진행 중인 게이지 배틀이 없습니다.");
+        return;
+      }
+      endGaugeBattle(activeBattle.id, true);
+    }
+
+    function endGaugeBattle(id, shouldRender = true) {
+      const nowDate = new Date();
+      const now = nowDate.toISOString();
+      const resultUntil = new Date(nowDate.getTime() + 10 * 1000).toISOString();
+      const battles = getGaugeBattles().map(battle => {
+        if (battle.id === id && battle.status === "active") {
+          return { ...battle, status: "ended", endedAt: now, resultUntil };
+        }
+        return battle;
+      });
+      saveGaugeBattles(battles, shouldRender);
+    }
+
+    function checkGaugeBattleExpiration() {
+      const activeBattle = getActiveGaugeBattle();
+      if (!activeBattle) return;
+      if (new Date(activeBattle.endAt).getTime() <= Date.now()) {
+        endGaugeBattle(activeBattle.id, false);
+      }
+    }
+
+    function cheerUpGaugeBattle(battleId) {
+      const battle = getGaugeBattles().find(item => item.id === battleId);
+      if (!battle || battle.status !== "active" || new Date(battle.endAt).getTime() <= Date.now()) {
+        alert("이미 종료된 게이지 배틀입니다.");
+        checkGaugeBattleExpiration();
+        renderAll();
+        return;
+      }
+
+      const department = getGaugeChoice(battleId);
+      if (!department) {
+        alert("먼저 응원할 항목을 선택해주세요.");
+        return;
+      }
+
+      const now = Date.now();
+      if (now - lastGaugeBoostAt < 180) return;
+      lastGaugeBoostAt = now;
+
+      const boosts = getGaugeBoosts();
+      boosts[battleId] = boosts[battleId] || {};
+      boosts[battleId][department] = Number(boosts[battleId][department] || 0) + 1;
+      saveGaugeBoosts(boosts);
+    }
+
+    function renderGaugeMiniRows(battle) {
+      const stats = getGaugeStats(battle);
+      return stats.options.map((option, index) => `
+        <div class="gauge-mini-row">
+          <div>${escapeHtml(option)}</div>
+          <div class="gauge-mini-bar-wrap"><div class="gauge-mini-bar" style="width:${stats.percentages[index]}%"></div></div>
+          <div>${stats.counts[index]}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderParticipantGaugeBattle() {
+      const area = document.getElementById("participantGaugeBattleArea");
+      if (!area) return;
+      const activeBattle = getActiveGaugeBattle();
+
+      if (!activeBattle) {
+        area.innerHTML = "";
+        return;
+      }
+
+      const choice = getGaugeChoice(activeBattle.id);
+      const options = getGaugeOptions(activeBattle);
+      area.innerHTML = `
+        <div class="participant-gauge-panel">
+          <div class="participant-gauge-kicker">🔥 LIVE GAME · 남은 시간 ${formatRemaining(activeBattle.endAt)}</div>
+          <h2 class="participant-gauge-title">${escapeHtml(activeBattle.title)}</h2>
+          <p class="participant-gauge-subtext">응원할 항목을 선택한 뒤 CHEER-UP 버튼을 눌러 게이지를 끌어올려주세요. 송출 화면에는 실시간 게이지 현황이 표시됩니다.</p>
+          ${choice ? `
+            <div class="cheer-control-wrap">
+              <div class="cheer-selected-card">
+                선택한 팀
+                <strong>${escapeHtml(choice)}</strong>
+                <button class="gauge-change-btn" onclick="clearGaugeChoice(${activeBattle.id})">항목 다시 선택하기</button>
+              </div>
+              <button class="cheer-up-btn" onclick="cheerUpGaugeBattle(${activeBattle.id})">CHEER-UP!</button>
+            </div>
+            <div class="gauge-mini-results">${renderGaugeMiniRows(activeBattle)}</div>
+          ` : `
+            <div class="gauge-dept-grid">
+              ${options.map(option => `
+                <button class="gauge-dept-btn ${getDeptClass(option)}" onclick="setGaugeChoice(${activeBattle.id}, '${escapeJs(option)}')">${escapeHtml(option)}</button>
+              `).join("")}
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    function renderAdminGaugeBattleStatus() {
+      const status = document.getElementById("currentGaugeBattleStatus");
+      if (!status) return;
+      const activeBattle = getActiveGaugeBattle();
+
+      if (!activeBattle) {
+        const latestEnded = getGaugeBattles()
+          .filter(battle => battle.status === "ended")
+          .sort((a, b) => new Date(b.endedAt || b.endAt) - new Date(a.endedAt || a.endAt))[0];
+
+        if (!latestEnded) {
+          status.innerHTML = "현재 진행 중인 게이지 배틀이 없습니다.";
+          return;
+        }
+
+        const stats = getGaugeStats(latestEnded);
+        status.innerHTML = `최근 종료: <b>${escapeHtml(latestEnded.title)}</b><br><span>총 ${stats.total} BOOST · 1위 ${escapeHtml(stats.options[stats.leaderIndex] || "-")}</span><div class="gauge-admin-results">${renderGaugeMiniRows(latestEnded)}</div>`;
+        return;
+      }
+
+      const stats = getGaugeStats(activeBattle);
+      status.innerHTML = `
+        진행 중: <b>${escapeHtml(activeBattle.title)}</b><br>
+        <span>남은 시간 ${formatRemaining(activeBattle.endAt)} · 총 ${stats.total} BOOST · 현재 1위 ${escapeHtml(stats.options[stats.leaderIndex] || "-")}</span>
+        <div class="gauge-admin-results">${renderGaugeMiniRows(activeBattle)}</div>
+      `;
+    }
+
+    function renderScreenGaugeBattle(battle, isResult = false) {
+      const stats = getGaugeStats(battle);
+      const leader = stats.options[stats.leaderIndex] || "-";
+      return `
+        <div class="gauge-screen ${isResult ? "result-mode" : ""}">
+          <div class="gauge-screen-header">
+            <div>
+              <div class="gauge-screen-kicker">${isResult ? "🏆 ACTS-ion GAUGE RESULT" : "🔥 ACTS-ion GAUGE BATTLE"}</div>
+              <h2 class="gauge-screen-title">${escapeHtml(battle.title)}</h2>
+            </div>
+            <div class="gauge-screen-side">
+              <div class="gauge-screen-timer-card">
+                <span>${isResult ? "결과 화면" : "남은 시간"}</span>
+                <div class="gauge-screen-timer">${isResult ? "RESULT" : formatRemainingSeconds(battle.endAt)}</div>
+                <div class="gauge-screen-total">총 ${stats.total} BOOST</div>
+              </div>
+              <div class="gauge-screen-qr-card">
+                <div class="qr-label">JOIN NOW</div>
+                <div class="qr-placeholder" aria-hidden="true"></div>
+                <div>QR 찍고<br />CHEER-UP!</div>
+              </div>
+            </div>
+          </div>
+          <div class="gauge-screen-bars">
+            ${stats.options.map((option, index) => `
+              <div class="gauge-screen-row ${index === stats.leaderIndex && stats.counts[index] > 0 ? "leader" : ""}">
+                <div class="gauge-screen-dept">${escapeHtml(option)}</div>
+                <div class="gauge-screen-bar-wrap"><div class="gauge-screen-bar" style="width:${stats.percentages[index]}%"></div></div>
+                <div class="gauge-screen-score">${stats.counts[index]}</div>
+              </div>
+            `).join("")}
+          </div>
+          <div class="gauge-screen-footer">
+            <div>${isResult ? "최종 1위" : "현재 1위"} · ${escapeHtml(leader)}</div>
+            <div>Presented by 밀알 총학생회</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdminPredictionStatus() {
+      const status = document.getElementById("currentPredictionStatus");
+      if (!status) return;
+      const activePrediction = getActivePrediction();
+      if (!activePrediction) {
+        const latestEndedPrediction = getLatestEndedPrediction();
+        if (latestEndedPrediction) {
+          const stats = getVoteStats(latestEndedPrediction);
+          status.innerHTML = `송출 중인 승부예측 결과: <b>${escapeHtml(latestEndedPrediction.title)}</b><br><span>총 ${stats.total}명 참여</span><br><button class="admin-small-btn" onclick="hideLatestPredictionResult()">승부예측 결과 내리기</button> <button class="admin-small-btn" onclick="openPastResults()">지난 결과 보기</button>`;
+        } else {
+          status.innerHTML = `현재 진행 중인 승부예측이 없습니다. <button class="admin-small-btn" onclick="openPastResults()">지난 결과 보기</button>`;
+        }
+        return;
+      }
+      const stats = getVoteStats(activePrediction);
+      status.innerHTML = `
+        진행 중: <b>${escapeHtml(activePrediction.title)}</b><br>
+        <span>남은 시간 ${formatRemaining(activePrediction.endAt)} · 총 ${stats.total}명 참여</span>
+        <div class="prediction-result-card">${renderResultRows(activePrediction, stats, false)}</div>
+      `;
+    }
+
+    function renderAdmin() {
+      const messages = getMessages();
+      const pendingList = document.getElementById("pendingList");
+      const approvedPreviewList = document.getElementById("approvedPreviewList");
+      const approvedAllList = document.getElementById("approvedAllList");
+      const approvedPreviewSummary = document.getElementById("approvedPreviewSummary");
+      const approvedAllCount = document.getElementById("approvedAllCount");
+      const pending = messages.filter(msg => msg.status === "pending");
+      const approved = messages
+        .filter(msg => msg.status === "approved")
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const approvedPreview = approved.slice(0, 5);
+      const notice = getNotice();
+      const noticeStatus = document.getElementById("currentNoticeStatus");
+
+      if (noticeStatus) {
+        noticeStatus.innerHTML = notice.active
+          ? `현재 송출 중: <b>${escapeHtml(notice.title || "알림")}</b><br><span>${escapeHtml(notice.body || "")}</span>`
+          : "현재 송출 중인 알림이 없습니다.";
+      }
+
+      if (!isAdminUnlocked) {
+        updateAdminModeVisibility();
+        return;
+      }
+
+      applyScreenRatioClass();
+      renderAdminDashboardStats();
+      renderScreenControlStatus();
+      renderAdminTickerStatus();
+      renderAdminPredictionStatus();
+      renderAdminGaugeBattleStatus();
+
+      if (!pendingList || !approvedPreviewList || !approvedAllList) return;
+      pendingList.innerHTML = pending.length
+        ? pending.map(msg => adminCard(msg, true)).join("")
+        : `<div class="empty">승인 대기 중인 메시지가 없습니다.</div>`;
+
+      approvedPreviewList.innerHTML = approvedPreview.length
+        ? approvedPreview.map(msg => adminCard(msg, false)).join("")
+        : `<div class="empty">승인된 메시지가 없습니다.</div>`;
+
+      approvedAllList.innerHTML = approved.length
+        ? approved.map(msg => adminCard(msg, false)).join("")
+        : `<div class="empty">승인된 메시지가 없습니다.</div>`;
+
+      if (approvedPreviewSummary) {
+        approvedPreviewSummary.textContent = approved.length > 5
+          ? `총 ${approved.length}개 중 최근 5개 표시 중 · 전체보기에서 나머지 메시지를 확인할 수 있습니다.`
+          : `총 ${approved.length}개의 승인 완료 메시지가 있습니다.`;
+      }
+
+      if (approvedAllCount) {
+        approvedAllCount.textContent = approved.length;
+      }
+    }
+
+    function toggleApprovedAllPanel(forceOpen) {
+      const panel = document.getElementById("approvedAllPanel");
+      const button = document.getElementById("approvedAllToggleBtn");
+      if (!panel) return;
+
+      const shouldOpen = typeof forceOpen === "boolean" ? forceOpen : !panel.classList.contains("active");
+      panel.classList.toggle("active", shouldOpen);
+
+      if (button) {
+        button.textContent = shouldOpen ? "전체보기 닫기" : "전체보기";
+      }
+
+      if (shouldOpen) {
+        renderAdmin();
+        panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function adminCard(msg, isPending) {
+      return `
+        <div class="admin-card">
+          <div class="meta">
+            <span class="dept-tag">${escapeHtml(normalizeDepartment(msg.department))}</span>
+            <span>${escapeHtml(msg.name)}</span>
+          </div>
+          <p>${escapeHtml(msg.message)}</p>
+          <div class="card-actions">
+            ${isPending
+              ? `<button class="approve" onclick="approveMessage(${msg.id})">승인</button>`
+              : `<button class="pin" onclick="togglePin(${msg.id})">${msg.pinned ? "고정 해제" : "상단 고정"}</button>`
+            }
+            <button class="delete" onclick="deleteMessage(${msg.id})">삭제</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function getApprovedMessages(limit = 9) {
+      return getMessages()
+        .filter(msg => msg.status === "approved")
+        .sort((a, b) => {
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        })
+        .slice(0, limit);
+    }
+
+    function renderMiniComments(messages) {
+      if (!messages.length) {
+        return `<div class="waiting" style="font-size:18px;padding:36px 18px;">아직 승인된 응원 메시지가 없습니다.</div>`;
+      }
+      return `
+        <div class="mini-comment-list">
+          ${messages.map(msg => {
+            const department = normalizeDepartment(msg.department);
+            return `
+              <div class="mini-comment ${getDeptClass(department)}">
+                <div class="mini-meta"><span>${escapeHtml(department)}</span><span>${escapeHtml(msg.name)}</span></div>
+                <p>${escapeHtml(msg.message)}</p>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderScreenPrediction(prediction, isResult) {
+      const stats = getVoteStats(prediction);
+      const label = isResult ? "승부예측 결과!" : "LIVE 승부예측";
+      const sideTitle = isResult ? "최종 결과" : "남은 시간";
+      const sideValue = isResult ? `${stats.total}명 참여` : formatRemaining(prediction.endAt);
+      const miniMessages = getApprovedMessages(6);
+
+      return `
+        <div class="screen-prediction-wrap">
+          <div class="screen-prediction-main">
+            <div class="screen-prediction-label">${label}</div>
+            <h2 class="screen-prediction-title">${escapeHtml(prediction.title)}</h2>
+            <p class="screen-prediction-desc">${escapeHtml(prediction.description || (isResult ? "제한시간이 종료되었습니다." : "실시간으로 결과가 반영됩니다."))}</p>
+            <div class="screen-results">${renderResultRows(prediction, stats, true)}</div>
+          </div>
+          <aside class="screen-prediction-side">
+            <div style="font-weight:950;color:rgba(255,255,255,0.72);margin-bottom:10px;">${sideTitle}</div>
+            <div class="screen-timer">${sideValue}</div>
+            <div class="screen-total-votes">현재 총 ${stats.total}명 참여</div>
+            <div style="margin-top:24px;font-weight:1000;">실시간 응원 댓글</div>
+            ${renderMiniComments(miniMessages)}
+          </aside>
+        </div>
+      `;
+    }
+
+    function renderWall() {
+      const wallGrid = document.getElementById("wallGrid");
+      if (!wallGrid) return;
+
+      if (getScreenMode() === "ready") {
+        wallGrid.innerHTML = renderReadyScreen();
+        return;
+      }
+
+      const activeGaugeBattle = getActiveGaugeBattle();
+      if (activeGaugeBattle) {
+        wallGrid.innerHTML = renderScreenGaugeBattle(activeGaugeBattle, false);
+        return;
+      }
+
+      const resultGaugeBattle = getVisibleGaugeResultBattle();
+      if (resultGaugeBattle) {
+        wallGrid.innerHTML = renderScreenGaugeBattle(resultGaugeBattle, true);
+        return;
+      }
+
+      const activePrediction = getActivePrediction();
+      if (activePrediction) {
+        wallGrid.innerHTML = renderScreenPrediction(activePrediction, false);
+        return;
+      }
+
+      const latestEndedPrediction = getLatestEndedPrediction();
+      if (latestEndedPrediction) {
+        wallGrid.innerHTML = renderScreenPrediction(latestEndedPrediction, true);
+        return;
+      }
+
+      const messages = getApprovedMessages(9);
+      if (!messages.length) {
+        wallGrid.innerHTML = `
+          <div class="waiting">
+            아직 승인된 메시지가 없습니다.<br />
+            QR을 찍고 첫 번째 응원 메시지를 남겨주세요!
+          </div>
+        `;
+        return;
+      }
+
+      wallGrid.innerHTML = messages.map(msg => {
+        const isNew = hasRenderedWallOnce && !shownMessageIds.has(msg.id);
+        shownMessageIds.add(msg.id);
+        const department = normalizeDepartment(msg.department);
+        const deptClass = getDeptClass(department);
+        const lengthClass = getMessageLengthClass(msg.message);
+
+        return `
+          <article class="live-card ${deptClass} ${lengthClass} ${msg.pinned ? "pinned" : ""} ${isNew ? "new-card" : ""}">
+            ${msg.pinned ? `<div class="admin-pick-label">밀총 관리자 PICK!</div>` : ""}
+            <div class="dept">${escapeHtml(department)}</div>
+            <p class="text">“${escapeHtml(msg.message)}”</p>
+            <div class="name">${escapeHtml(msg.name)}</div>
+          </article>
+        `;
+      }).join("");
+      hasRenderedWallOnce = true;
+    }
+
+    function renderBroadcastNotice() {
+      const notice = getNotice();
+      const screenAlert = document.getElementById("screenAlert");
+      const screenAlertTitle = document.getElementById("screenAlertTitle");
+      const screenAlertBody = document.getElementById("screenAlertBody");
+      if (!screenAlert || !screenAlertTitle || !screenAlertBody) return;
+
+      if (notice.active && notice.title && notice.body) {
+        screenAlertTitle.textContent = notice.title;
+        screenAlertBody.textContent = notice.body;
+        screenAlert.style.display = "block";
+        if (notice.updatedAt && notice.updatedAt !== lastPlayedNoticeUpdatedAt) {
+          lastPlayedNoticeUpdatedAt = notice.updatedAt;
+          playNoticeSound();
+        }
+      } else {
+        screenAlert.style.display = "none";
+        screenAlertTitle.textContent = "";
+        screenAlertBody.textContent = "";
+      }
+    }
+
+    function playNoticeSound() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        audioContext = audioContext || new AudioContext();
+        if (audioContext.state === "suspended") audioContext.resume();
+        const now = audioContext.currentTime;
+        const frequencies = [659.25, 783.99, 987.77];
+        frequencies.forEach((frequency, index) => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.type = "sine";
+          oscillator.frequency.setValueAtTime(frequency, now + index * 0.12);
+          gainNode.gain.setValueAtTime(0, now + index * 0.12);
+          gainNode.gain.linearRampToValueAtTime(0.22, now + index * 0.12 + 0.015);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, now + index * 0.12 + 0.22);
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.start(now + index * 0.12);
+          oscillator.stop(now + index * 0.12 + 0.24);
+        });
+      } catch (error) {
+        console.warn("알림 효과음을 재생할 수 없습니다.", error);
+      }
+    }
+
+    function renderAll() {
+      checkPredictionExpiration();
+      checkGaugeBattleExpiration();
+      applyScreenRatioClass();
+      applyScreenModeClass();
+      renderParticipantGaugeBattle();
+      renderParticipantPrediction();
+      renderAdmin();
+      renderWall();
+      renderBroadcastNotice();
+      renderScreenTicker();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text || "";
+      return div.innerHTML;
+    }
+
+    function escapeJs(text) {
+      return String(text || "")
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'")
+        .replaceAll("\n", "\\n");
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && document.getElementById("screen")?.classList.contains("active") && isAdminUnlocked) {
+        showPage("admin");
+      }
+    });
+
+    applyScreenRatioClass();
+    updateAdminModeVisibility();
+    renderAll();
+    setInterval(renderAll, 1000);
+  </script>
+</body>
+</html>
