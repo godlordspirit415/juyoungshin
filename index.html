@@ -3322,6 +3322,335 @@
       }
     }
 
+
+
+    /* 전문 농구 스코어보드 확장 */
+    .basketball-admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .basketball-admin-card {
+      border: 1px solid #E5E7EB;
+      border-radius: 22px;
+      background: #FFFFFF;
+      padding: 18px;
+      box-shadow: 0 10px 24px rgba(17,24,39,0.06);
+    }
+
+    .basketball-admin-card h3 {
+      margin: 0 0 14px;
+      color: #052E16;
+      font-size: 20px;
+      letter-spacing: -0.04em;
+    }
+
+    .basketball-controls-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .basketball-controls-grid button,
+    .basketball-mini-controls button,
+    .basketball-clock-controls button,
+    .basketball-possession-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 10px;
+      background: #ECFDF5;
+      color: #047857;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .basketball-controls-grid .minus,
+    .basketball-mini-controls .minus {
+      background: #FEF2F2;
+      color: #B91C1C;
+    }
+
+    .basketball-mini-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .basketball-clock-admin {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .basketball-clock-controls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .basketball-clock-controls .danger {
+      background: #FEF2F2;
+      color: #B91C1C;
+    }
+
+    .basketball-clock-controls .dark {
+      background: #052E16;
+      color: #FFFFFF;
+    }
+
+    .basketball-admin-display-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .basketball-admin-display {
+      border-radius: 18px;
+      background: #052E16;
+      color: #FFFFFF;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .basketball-admin-display span {
+      display: block;
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .basketball-admin-display b {
+      font-size: 38px;
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .basketball-shot-display b {
+      color: #FACC15;
+    }
+
+    .basketball-scoreboard-screen {
+      width: 100%;
+      min-height: calc(100vh - 120px);
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      gap: clamp(10px, 1.5vw, 18px);
+      color: white;
+    }
+
+    .ratio-4-3 .basketball-scoreboard-screen {
+      min-height: auto;
+      height: calc(100% - 8px);
+      max-height: calc((100vw - 72px) * 0.75);
+    }
+
+    .basketball-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 16px;
+      border-radius: 20px;
+      background: rgba(5,46,22,0.42);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .basketball-game-title {
+      font-size: clamp(18px, 2vw, 32px);
+      font-weight: 1000;
+      letter-spacing: -0.05em;
+      word-break: keep-all;
+    }
+
+    .basketball-period-badge {
+      border-radius: 999px;
+      padding: 9px 16px;
+      background: linear-gradient(135deg, #FACC15, #FB923C);
+      color: #111827;
+      font-weight: 1000;
+      white-space: nowrap;
+    }
+
+    .basketball-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 0.62fr) minmax(0, 1fr);
+      gap: clamp(12px, 2vw, 24px);
+      align-items: stretch;
+    }
+
+    .basketball-team-panel {
+      border-radius: 32px;
+      padding: clamp(18px, 3vw, 36px);
+      background: rgba(255,255,255,0.96);
+      color: #052E16;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.28);
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .basketball-team-panel.leading {
+      outline: 5px solid #FACC15;
+      box-shadow: 0 0 0 8px rgba(250,204,21,0.14), 0 24px 70px rgba(0,0,0,0.28);
+    }
+
+    .basketball-team-name-screen {
+      font-size: clamp(26px, 3.4vw, 54px);
+      font-weight: 1000;
+      letter-spacing: -0.07em;
+      line-height: 1;
+      word-break: keep-all;
+      min-height: 1.2em;
+    }
+
+    .basketball-score-screen {
+      align-self: center;
+      justify-self: center;
+      font-size: clamp(88px, 13vw, 210px);
+      font-weight: 1000;
+      letter-spacing: -0.09em;
+      line-height: 0.84;
+      color: #052E16;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .basketball-team-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .basketball-meta-box {
+      border-radius: 16px;
+      background: #F0FDF4;
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #DCFCE7;
+    }
+
+    .basketball-meta-box span {
+      display: block;
+      color: #047857;
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: 0.06em;
+    }
+
+    .basketball-meta-box b {
+      display: block;
+      margin-top: 4px;
+      font-size: clamp(22px, 2.8vw, 42px);
+      font-weight: 1000;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .basketball-center-panel {
+      border-radius: 32px;
+      padding: clamp(16px, 2.4vw, 28px);
+      background: rgba(5,46,22,0.72);
+      border: 1px solid rgba(255,255,255,0.18);
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      text-align: center;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.22);
+    }
+
+    .basketball-clock-label {
+      color: rgba(255,255,255,0.66);
+      font-weight: 1000;
+      letter-spacing: 0.08em;
+      font-size: 13px;
+    }
+
+    .basketball-game-clock {
+      font-size: clamp(54px, 7vw, 112px);
+      font-weight: 1000;
+      line-height: 0.95;
+      letter-spacing: -0.08em;
+      font-variant-numeric: tabular-nums;
+      color: #FFFFFF;
+    }
+
+    .basketball-shot-card {
+      border-radius: 24px;
+      background: #111827;
+      border: 3px solid #FACC15;
+      padding: 14px;
+      box-shadow: inset 0 0 24px rgba(250,204,21,0.12);
+    }
+
+    .basketball-shot-card .basketball-shot-number {
+      font-size: clamp(54px, 7vw, 106px);
+      font-weight: 1000;
+      line-height: 0.9;
+      color: #FACC15;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .basketball-possession-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      padding: 10px 12px;
+      color: rgba(255,255,255,0.86);
+      font-weight: 1000;
+      word-break: keep-all;
+    }
+
+    .basketball-bottom-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .basketball-strip-box {
+      border-radius: 18px;
+      background: rgba(255,255,255,0.13);
+      border: 1px solid rgba(255,255,255,0.14);
+      padding: 12px;
+      text-align: center;
+      font-weight: 950;
+      color: rgba(255,255,255,0.88);
+    }
+
+    .basketball-buzzer-flash {
+      animation: buzzerFlash 0.35s ease alternate infinite;
+    }
+
+    @keyframes buzzerFlash {
+      from { filter: brightness(1); }
+      to { filter: brightness(1.35); }
+    }
+
+    @media (max-width: 900px) {
+      .basketball-admin-grid,
+      .basketball-clock-admin,
+      .basketball-admin-display-row,
+      .basketball-main,
+      .basketball-bottom-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .basketball-clock-controls,
+      .basketball-controls-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
   </style>
 </head>
 
@@ -3700,12 +4029,56 @@
       <div id="scoreboardAdminPanel" class="panel scoreboard-admin-panel">
         <div class="scoreboard-admin-header">
           <div>
-            <h2>스코어보드 관리</h2>
-            <p>경기명, 팀명, 점수, 타이머를 관리하고 송출 화면에 점수판을 띄울 수 있습니다.</p>
+            <h2>전문 농구 스코어보드 관리</h2>
+            <p>점수, 경기 시간, 24초 공격 제한, 파울, 타임아웃, 공격권까지 농구 경기용으로 관리합니다.</p>
           </div>
         </div>
-        <div class="scoreboard-admin-grid">
-          <div class="scoreboard-team-admin">
+
+        <div class="basketball-admin-display-row">
+          <div class="basketball-admin-display">
+            <span>GAME CLOCK</span>
+            <b id="scoreboardAdminTime">10:00</b>
+          </div>
+          <div class="basketball-admin-display basketball-shot-display">
+            <span>SHOT CLOCK</span>
+            <b id="scoreboardAdminShotTime">24</b>
+          </div>
+        </div>
+
+        <div class="basketball-clock-admin">
+          <div>
+            <label for="scoreboardTitle">경기명</label>
+            <input id="scoreboardTitle" type="text" maxlength="32" placeholder="예: 농구 결승전" />
+          </div>
+          <div>
+            <label for="scoreboardPeriod">쿼터</label>
+            <select id="scoreboardPeriod">
+              <option value="1Q">1Q</option>
+              <option value="2Q">2Q</option>
+              <option value="3Q">3Q</option>
+              <option value="4Q">4Q</option>
+              <option value="OT">OT</option>
+            </select>
+          </div>
+          <div>
+            <label for="scoreboardDurationMinutes">경기 시간/분</label>
+            <input id="scoreboardDurationMinutes" type="number" min="1" max="60" value="10" />
+          </div>
+        </div>
+
+        <div class="basketball-clock-controls">
+          <button class="dark" onclick="startScoreboardTimer()">경기 시작/재개</button>
+          <button onclick="pauseScoreboardTimer()">전체 정지</button>
+          <button onclick="resetScoreboardTimer()">경기시간 리셋</button>
+          <button class="danger" onclick="playScoreboardBuzzer(true)">버저 테스트</button>
+          <button onclick="resetShotClock(24)">24초 리셋</button>
+          <button onclick="resetShotClock(14)">14초 리셋</button>
+          <button onclick="startShotClockOnly()">24초 시작</button>
+          <button onclick="pauseShotClockOnly()">24초 정지</button>
+        </div>
+
+        <div class="basketball-admin-grid">
+          <div class="basketball-admin-card">
             <h3>왼쪽 팀</h3>
             <label for="scoreboardTeamAName">팀 이름</label>
             <input id="scoreboardTeamAName" type="text" maxlength="24" placeholder="예: 신학과" />
@@ -3718,15 +4091,23 @@
                 <button class="clear-notice-btn" style="padding:14px 10px;font-size:14px;" onclick="saveScoreboardFromInputs()">저장</button>
               </div>
             </div>
-            <div class="scoreboard-score-controls">
+            <div class="basketball-controls-grid">
               <button onclick="adjustScoreboardScore('A', 1)">+1</button>
               <button onclick="adjustScoreboardScore('A', 2)">+2</button>
               <button onclick="adjustScoreboardScore('A', 3)">+3</button>
-              <button onclick="adjustScoreboardScore('A', -1)">-1</button>
+              <button class="minus" onclick="adjustScoreboardScore('A', -1)">-1</button>
+            </div>
+            <div class="basketball-mini-controls">
+              <button onclick="adjustScoreboardStat('A','fouls',1)">파울 +</button>
+              <button class="minus" onclick="adjustScoreboardStat('A','fouls',-1)">파울 -</button>
+              <button onclick="setScoreboardPossession('A')">공격권</button>
+              <button onclick="adjustScoreboardStat('A','timeouts',1)">작전 +</button>
+              <button class="minus" onclick="adjustScoreboardStat('A','timeouts',-1)">작전 -</button>
+              <button onclick="resetTeamBasketballStats('A')">팀 리셋</button>
             </div>
           </div>
 
-          <div class="scoreboard-team-admin">
+          <div class="basketball-admin-card">
             <h3>오른쪽 팀</h3>
             <label for="scoreboardTeamBName">팀 이름</label>
             <input id="scoreboardTeamBName" type="text" maxlength="24" placeholder="예: AIGS" />
@@ -3739,42 +4120,31 @@
                 <button class="clear-notice-btn" style="padding:14px 10px;font-size:14px;" onclick="saveScoreboardFromInputs()">저장</button>
               </div>
             </div>
-            <div class="scoreboard-score-controls">
+            <div class="basketball-controls-grid">
               <button onclick="adjustScoreboardScore('B', 1)">+1</button>
               <button onclick="adjustScoreboardScore('B', 2)">+2</button>
               <button onclick="adjustScoreboardScore('B', 3)">+3</button>
-              <button onclick="adjustScoreboardScore('B', -1)">-1</button>
+              <button class="minus" onclick="adjustScoreboardScore('B', -1)">-1</button>
             </div>
-          </div>
-
-          <div class="scoreboard-timer-admin">
-            <label for="scoreboardTitle">경기명</label>
-            <input id="scoreboardTitle" type="text" maxlength="32" placeholder="예: 피구 결승전" />
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
-              <div>
-                <label for="scoreboardPeriod">표시 라벨</label>
-                <input id="scoreboardPeriod" type="text" maxlength="16" placeholder="예: 1 SET" />
-              </div>
-              <div>
-                <label for="scoreboardDurationMinutes">타이머 분</label>
-                <input id="scoreboardDurationMinutes" type="number" min="1" max="180" value="10" />
-              </div>
-            </div>
-            <div id="scoreboardAdminTime" class="scoreboard-admin-time">10:00</div>
-            <div class="scoreboard-timer-controls">
-              <button onclick="startScoreboardTimer()">타이머 시작</button>
-              <button onclick="pauseScoreboardTimer()">타이머 정지</button>
-              <button onclick="resetScoreboardTimer()">타이머 리셋</button>
-              <button onclick="resetScoreboardScores()">점수 초기화</button>
+            <div class="basketball-mini-controls">
+              <button onclick="adjustScoreboardStat('B','fouls',1)">파울 +</button>
+              <button class="minus" onclick="adjustScoreboardStat('B','fouls',-1)">파울 -</button>
+              <button onclick="setScoreboardPossession('B')">공격권</button>
+              <button onclick="adjustScoreboardStat('B','timeouts',1)">작전 +</button>
+              <button class="minus" onclick="adjustScoreboardStat('B','timeouts',-1)">작전 -</button>
+              <button onclick="resetTeamBasketballStats('B')">팀 리셋</button>
             </div>
           </div>
         </div>
+
         <div class="scoreboard-mode-controls">
           <button onclick="saveScoreboardFromInputs()">스코어보드 저장</button>
+          <button onclick="resetScoreboardScores()">점수 초기화</button>
           <button onclick="setScreenMode('scoreboard')">스코어보드 송출</button>
           <button class="danger" onclick="setScreenMode('live')">점수판 내리기</button>
         </div>
         <div id="scoreboardAdminStatus" class="scoreboard-status-line">스코어보드 정보를 불러오는 중입니다.</div>
+      </div>
       </div>
       </div>
       <div class="presented-footer">Presented by 밀알 총학생회</div>
@@ -3858,16 +4228,27 @@
     const ASHINI_PROFILE_KEY = "acts_cheer_up_booth_ashini_profile";
     const DEFAULT_GAUGE_OPTIONS = ["신학과", "기독교상담학과", "사회복지선교학과", "기독교교육과미디어학과", "AIGS"];
     const DEFAULT_SCOREBOARD = {
-      title: "ACTS SCOREBOARD",
+      title: "ACTS BASKETBALL",
       teamAName: "TEAM A",
       teamBName: "TEAM B",
       teamAScore: 0,
       teamBScore: 0,
-      period: "1 SET",
+      period: "1Q",
       timerSeconds: 600,
       initialSeconds: 600,
       timerRunning: false,
       timerStartedAt: null,
+      shotClockSeconds: 24,
+      shotClockInitial: 24,
+      shotClockRunning: false,
+      shotClockStartedAt: null,
+      teamAFouls: 0,
+      teamBFouls: 0,
+      teamATimeouts: 5,
+      teamBTimeouts: 5,
+      possession: "A",
+      gameBuzzerAt: "",
+      shotBuzzerAt: "",
       updatedAt: ""
     };
     let isAdminUnlocked = sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "true";
@@ -4285,11 +4666,22 @@
       return Math.max(0, baseSeconds - Math.max(0, elapsed));
     }
 
+    function getShotClockRemainingSeconds(scoreboard = getScoreboard()) {
+      const baseSeconds = Math.max(0, Number(scoreboard.shotClockSeconds ?? scoreboard.shotClockInitial ?? 24));
+      if (!scoreboard.shotClockRunning || !scoreboard.shotClockStartedAt) return baseSeconds;
+      const elapsed = Math.floor((Date.now() - new Date(scoreboard.shotClockStartedAt).getTime()) / 1000);
+      return Math.max(0, baseSeconds - Math.max(0, elapsed));
+    }
+
     function formatScoreboardTime(seconds) {
       const safeSeconds = Math.max(0, Number(seconds || 0));
       const minutes = Math.floor(safeSeconds / 60);
       const remain = safeSeconds % 60;
       return `${String(minutes).padStart(2, "0")}:${String(remain).padStart(2, "0")}`;
+    }
+
+    function formatShotClock(seconds) {
+      return String(Math.max(0, Math.ceil(Number(seconds || 0)))).padStart(2, "0");
     }
 
     function setInputValueIfNotFocused(id, value) {
@@ -4301,8 +4693,9 @@
     function renderAdminScoreboard() {
       const board = getScoreboard();
       const remaining = getScoreboardRemainingSeconds(board);
-      setInputValueIfNotFocused("scoreboardTitle", board.title || "ACTS SCOREBOARD");
-      setInputValueIfNotFocused("scoreboardPeriod", board.period || "1 SET");
+      const shotRemaining = getShotClockRemainingSeconds(board);
+      setInputValueIfNotFocused("scoreboardTitle", board.title || "ACTS BASKETBALL");
+      setInputValueIfNotFocused("scoreboardPeriod", board.period || "1Q");
       setInputValueIfNotFocused("scoreboardTeamAName", board.teamAName || "TEAM A");
       setInputValueIfNotFocused("scoreboardTeamBName", board.teamBName || "TEAM B");
       setInputValueIfNotFocused("scoreboardTeamAScore", Number(board.teamAScore || 0));
@@ -4311,18 +4704,21 @@
 
       const timeEl = document.getElementById("scoreboardAdminTime");
       if (timeEl) timeEl.textContent = formatScoreboardTime(remaining);
+      const shotEl = document.getElementById("scoreboardAdminShotTime");
+      if (shotEl) shotEl.textContent = formatShotClock(shotRemaining);
       const status = document.getElementById("scoreboardAdminStatus");
       if (status) {
-        const modeText = getScreenMode() === "scoreboard" ? "현재 송출 화면에 점수판이 표시 중입니다." : "점수판은 저장되어 있고, 송출 버튼을 누르면 화면에 표시됩니다.";
-        status.innerHTML = `${modeText}<br><span style="font-weight:650;color:#6B7280;">${escapeHtml(board.teamAName)} ${Number(board.teamAScore || 0)} : ${Number(board.teamBScore || 0)} ${escapeHtml(board.teamBName)} · ${formatScoreboardTime(remaining)}</span>`;
+        const modeText = getScreenMode() === "scoreboard" ? "현재 송출 화면에 농구 스코어보드가 표시 중입니다." : "점수판은 저장되어 있고, 송출 버튼을 누르면 화면에 표시됩니다.";
+        const possessionName = board.possession === "B" ? board.teamBName : board.teamAName;
+        status.innerHTML = `${modeText}<br><span style="font-weight:650;color:#6B7280;">${escapeHtml(board.period)} · ${escapeHtml(board.teamAName)} ${Number(board.teamAScore || 0)} : ${Number(board.teamBScore || 0)} ${escapeHtml(board.teamBName)} · ${formatScoreboardTime(remaining)} · 24초 ${formatShotClock(shotRemaining)} · 공격권 ${escapeHtml(possessionName)}</span>`;
       }
     }
 
     function saveScoreboardFromInputs() {
       if (!requireAdminMode()) return;
       const current = getScoreboard();
-      const title = document.getElementById("scoreboardTitle")?.value.trim() || "ACTS SCOREBOARD";
-      const period = document.getElementById("scoreboardPeriod")?.value.trim() || "1 SET";
+      const title = document.getElementById("scoreboardTitle")?.value.trim() || "ACTS BASKETBALL";
+      const period = document.getElementById("scoreboardPeriod")?.value.trim() || "1Q";
       const teamAName = document.getElementById("scoreboardTeamAName")?.value.trim() || "TEAM A";
       const teamBName = document.getElementById("scoreboardTeamBName")?.value.trim() || "TEAM B";
       const teamAScore = Math.max(0, Number(document.getElementById("scoreboardTeamAScore")?.value || 0));
@@ -4330,6 +4726,7 @@
       const durationMinutes = Math.max(1, Number(document.getElementById("scoreboardDurationMinutes")?.value || 10));
       const initialSeconds = Math.round(durationMinutes * 60);
       const remaining = getScoreboardRemainingSeconds(current);
+      const shotRemaining = getShotClockRemainingSeconds(current);
       const shouldResetTimer = initialSeconds !== Number(current.initialSeconds || 600) && !current.timerRunning;
       saveScoreboard({
         ...current,
@@ -4342,7 +4739,10 @@
         initialSeconds,
         timerSeconds: shouldResetTimer ? initialSeconds : remaining,
         timerRunning: current.timerRunning,
-        timerStartedAt: current.timerRunning ? new Date().toISOString() : null
+        timerStartedAt: current.timerRunning ? new Date().toISOString() : null,
+        shotClockSeconds: shotRemaining,
+        shotClockRunning: current.shotClockRunning,
+        shotClockStartedAt: current.shotClockRunning ? new Date().toISOString() : null
       });
     }
 
@@ -4353,25 +4753,57 @@
       saveScoreboard({ ...board, [key]: Math.max(0, Number(board[key] || 0) + Number(delta || 0)) });
     }
 
+    function adjustScoreboardStat(team, stat, delta) {
+      if (!requireAdminMode()) return;
+      const board = getScoreboard();
+      const keyMap = {
+        A: { fouls: "teamAFouls", timeouts: "teamATimeouts" },
+        B: { fouls: "teamBFouls", timeouts: "teamBTimeouts" }
+      };
+      const key = keyMap[team]?.[stat];
+      if (!key) return;
+      const maxValue = stat === "timeouts" ? 9 : 99;
+      saveScoreboard({ ...board, [key]: Math.min(maxValue, Math.max(0, Number(board[key] || 0) + Number(delta || 0))) });
+    }
+
+    function setScoreboardPossession(team) {
+      if (!requireAdminMode()) return;
+      const board = getScoreboard();
+      saveScoreboard({ ...board, possession: team === "B" ? "B" : "A" });
+    }
+
+    function resetTeamBasketballStats(team) {
+      if (!requireAdminMode()) return;
+      const board = getScoreboard();
+      if (team === "B") {
+        saveScoreboard({ ...board, teamBScore: 0, teamBFouls: 0, teamBTimeouts: 5 });
+      } else {
+        saveScoreboard({ ...board, teamAScore: 0, teamAFouls: 0, teamATimeouts: 5 });
+      }
+    }
+
     function resetScoreboardScores() {
       if (!requireAdminMode()) return;
-      if (!confirm("스코어보드 점수를 0:0으로 초기화할까요?")) return;
+      if (!confirm("스코어보드 점수와 팀 파울을 초기화할까요?")) return;
       const board = getScoreboard();
-      saveScoreboard({ ...board, teamAScore: 0, teamBScore: 0 });
+      saveScoreboard({ ...board, teamAScore: 0, teamBScore: 0, teamAFouls: 0, teamBFouls: 0, teamATimeouts: 5, teamBTimeouts: 5, possession: "A" });
     }
 
     function startScoreboardTimer() {
       if (!requireAdminMode()) return;
       saveScoreboardFromInputs();
       const board = getScoreboard();
-      const remaining = getScoreboardRemainingSeconds(board);
-      saveScoreboard({ ...board, timerSeconds: remaining || Number(board.initialSeconds || 600), timerRunning: true, timerStartedAt: new Date().toISOString() });
+      const remaining = getScoreboardRemainingSeconds(board) || Number(board.initialSeconds || 600);
+      const shotRemaining = getShotClockRemainingSeconds(board) || Number(board.shotClockInitial || 24);
+      const now = new Date().toISOString();
+      saveScoreboard({ ...board, timerSeconds: remaining, timerRunning: true, timerStartedAt: now, shotClockSeconds: shotRemaining, shotClockRunning: true, shotClockStartedAt: now });
+      ensureAudioContext();
     }
 
     function pauseScoreboardTimer() {
       if (!requireAdminMode()) return;
       const board = getScoreboard();
-      saveScoreboard({ ...board, timerSeconds: getScoreboardRemainingSeconds(board), timerRunning: false, timerStartedAt: null });
+      saveScoreboard({ ...board, timerSeconds: getScoreboardRemainingSeconds(board), timerRunning: false, timerStartedAt: null, shotClockSeconds: getShotClockRemainingSeconds(board), shotClockRunning: false, shotClockStartedAt: null });
     }
 
     function resetScoreboardTimer() {
@@ -4379,9 +4811,96 @@
       const board = getScoreboard();
       const durationMinutes = Math.max(1, Number(document.getElementById("scoreboardDurationMinutes")?.value || Math.round(Number(board.initialSeconds || 600) / 60)));
       const initialSeconds = Math.round(durationMinutes * 60);
-      saveScoreboard({ ...board, initialSeconds, timerSeconds: initialSeconds, timerRunning: false, timerStartedAt: null });
+      saveScoreboard({ ...board, initialSeconds, timerSeconds: initialSeconds, timerRunning: false, timerStartedAt: null, shotClockSeconds: 24, shotClockInitial: 24, shotClockRunning: false, shotClockStartedAt: null, gameBuzzerAt: "", shotBuzzerAt: "" });
     }
 
+    function resetShotClock(seconds = 24) {
+      if (!requireAdminMode()) return;
+      const board = getScoreboard();
+      const nextSeconds = Math.max(1, Number(seconds || 24));
+      const now = new Date().toISOString();
+      saveScoreboard({ ...board, shotClockInitial: nextSeconds, shotClockSeconds: nextSeconds, shotClockRunning: board.timerRunning, shotClockStartedAt: board.timerRunning ? now : null, shotBuzzerAt: "" });
+    }
+
+    function startShotClockOnly() {
+      if (!requireAdminMode()) return;
+      const board = getScoreboard();
+      const shotRemaining = getShotClockRemainingSeconds(board) || Number(board.shotClockInitial || 24);
+      saveScoreboard({ ...board, shotClockSeconds: shotRemaining, shotClockRunning: true, shotClockStartedAt: new Date().toISOString() });
+      ensureAudioContext();
+    }
+
+    function pauseShotClockOnly() {
+      if (!requireAdminMode()) return;
+      const board = getScoreboard();
+      saveScoreboard({ ...board, shotClockSeconds: getShotClockRemainingSeconds(board), shotClockRunning: false, shotClockStartedAt: null });
+    }
+
+    function ensureAudioContext() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return null;
+        audioContext = audioContext || new AudioContext();
+        if (audioContext.state === "suspended") audioContext.resume();
+        return audioContext;
+      } catch (error) {
+        console.warn("오디오 컨텍스트를 사용할 수 없습니다.", error);
+        return null;
+      }
+    }
+
+    let lastScoreboardBuzzerKey = "";
+    function playScoreboardBuzzer(manual = false) {
+      try {
+        const context = ensureAudioContext();
+        if (!context) return;
+        const now = context.currentTime;
+        const oscillator = context.createOscillator();
+        const gainNode = context.createGain();
+        oscillator.type = "square";
+        oscillator.frequency.setValueAtTime(176, now);
+        gainNode.gain.setValueAtTime(0.0001, now);
+        gainNode.gain.exponentialRampToValueAtTime(manual ? 0.18 : 0.28, now + 0.03);
+        gainNode.gain.setValueAtTime(manual ? 0.18 : 0.28, now + 1.85);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 2.0);
+        oscillator.connect(gainNode);
+        gainNode.connect(context.destination);
+        oscillator.start(now);
+        oscillator.stop(now + 2.02);
+      } catch (error) {
+        console.warn("버저를 재생할 수 없습니다.", error);
+      }
+    }
+
+    function checkScoreboardExpiration() {
+      const board = getScoreboard();
+      let changed = false;
+      const updates = { ...board };
+      const nowIso = new Date().toISOString();
+      if (board.timerRunning && getScoreboardRemainingSeconds(board) <= 0) {
+        updates.timerSeconds = 0;
+        updates.timerRunning = false;
+        updates.timerStartedAt = null;
+        updates.shotClockRunning = false;
+        updates.shotClockStartedAt = null;
+        updates.gameBuzzerAt = nowIso;
+        changed = true;
+      }
+      if (board.shotClockRunning && getShotClockRemainingSeconds(board) <= 0) {
+        updates.shotClockSeconds = 0;
+        updates.shotClockRunning = false;
+        updates.shotClockStartedAt = null;
+        updates.shotBuzzerAt = nowIso;
+        changed = true;
+      }
+      if (changed) saveScoreboard(updates, false);
+
+      const buzzerKey = `${updates.gameBuzzerAt || ""}|${updates.shotBuzzerAt || ""}`;
+      if (buzzerKey && buzzerKey !== "|" && buzzerKey !== lastScoreboardBuzzerKey) {
+        lastScoreboardBuzzerKey = buzzerKey;
+        playScoreboardBuzzer(false);
+      }
+    }
 
     function renderScoreboardLiveMessages() {
       const messages = getApprovedMessages(3);
@@ -4415,30 +4934,56 @@
     function renderScreenScoreboard() {
       const board = getScoreboard();
       const remaining = getScoreboardRemainingSeconds(board);
+      const shotRemaining = getShotClockRemainingSeconds(board);
       const aScore = Number(board.teamAScore || 0);
       const bScore = Number(board.teamBScore || 0);
       const aLead = aScore > bScore;
       const bLead = bScore > aScore;
+      const possessionName = board.possession === "B" ? board.teamBName : board.teamAName;
+      const isBuzzerState = remaining <= 0 || shotRemaining <= 0;
       return `
-        <div class="scoreboard-screen">
-          <div class="scoreboard-title-card">
-            <div class="label">ACTS SPORTS DAY SCOREBOARD</div>
-            <h2>${escapeHtml(board.title || "ACTS SCOREBOARD")}</h2>
+        <div class="basketball-scoreboard-screen ${isBuzzerState ? "basketball-buzzer-flash" : ""}">
+          <div class="basketball-topline">
+            <div class="basketball-game-title">${escapeHtml(board.title || "ACTS BASKETBALL")}</div>
+            <div class="basketball-period-badge">${escapeHtml(board.period || "1Q")}</div>
           </div>
-          <div class="scoreboard-main-grid">
-            <section class="scoreboard-team-card ${aLead ? "leading" : ""}">
-              <div class="scoreboard-team-name">${escapeHtml(board.teamAName || "TEAM A")}</div>
-              <div class="scoreboard-team-score">${aScore}</div>
+
+          <div class="basketball-main">
+            <section class="basketball-team-panel ${aLead ? "leading" : ""}">
+              <div class="basketball-team-name-screen">${board.possession === "A" ? "▶ " : ""}${escapeHtml(board.teamAName || "TEAM A")}</div>
+              <div class="basketball-score-screen">${aScore}</div>
+              <div class="basketball-team-meta">
+                <div class="basketball-meta-box"><span>TEAM FOULS</span><b>${Number(board.teamAFouls || 0)}</b></div>
+                <div class="basketball-meta-box"><span>TIMEOUTS</span><b>${Number(board.teamATimeouts ?? 0)}</b></div>
+              </div>
             </section>
-            <section class="scoreboard-center-card">
-              <div class="scoreboard-period">${escapeHtml(board.period || "1 SET")}</div>
-              <div class="scoreboard-clock">${formatScoreboardTime(remaining)}</div>
-              <div class="scoreboard-vs">VS</div>
+
+            <section class="basketball-center-panel">
+              <div>
+                <div class="basketball-clock-label">GAME CLOCK</div>
+                <div class="basketball-game-clock">${formatScoreboardTime(remaining)}</div>
+              </div>
+              <div class="basketball-shot-card">
+                <div class="basketball-clock-label">SHOT CLOCK</div>
+                <div class="basketball-shot-number">${formatShotClock(shotRemaining)}</div>
+              </div>
+              <div class="basketball-possession-screen">공격권 · ${escapeHtml(possessionName || "TEAM A")}</div>
             </section>
-            <section class="scoreboard-team-card ${bLead ? "leading" : ""}">
-              <div class="scoreboard-team-name">${escapeHtml(board.teamBName || "TEAM B")}</div>
-              <div class="scoreboard-team-score">${bScore}</div>
+
+            <section class="basketball-team-panel ${bLead ? "leading" : ""}">
+              <div class="basketball-team-name-screen">${escapeHtml(board.teamBName || "TEAM B")}${board.possession === "B" ? " ◀" : ""}</div>
+              <div class="basketball-score-screen">${bScore}</div>
+              <div class="basketball-team-meta">
+                <div class="basketball-meta-box"><span>TEAM FOULS</span><b>${Number(board.teamBFouls || 0)}</b></div>
+                <div class="basketball-meta-box"><span>TIMEOUTS</span><b>${Number(board.teamBTimeouts ?? 0)}</b></div>
+              </div>
             </section>
+          </div>
+
+          <div class="basketball-bottom-strip">
+            <div class="basketball-strip-box">24초 리셋 기준 · 24 / 14</div>
+            <div class="basketball-strip-box">점수 조작 · 1점 / 2점 / 3점</div>
+            <div class="basketball-strip-box">시간 종료 시 버저 2초</div>
           </div>
           ${renderScoreboardLiveMessages()}
           <div class="scoreboard-screen-footer">Presented by 밀알 총학생회</div>
@@ -5875,6 +6420,7 @@
       renderAdminTickerStatus();
       renderAdminPredictionStatus();
       renderAdminGaugeBattleStatus();
+      renderAdminScoreboard();
 
       if (!pendingList || !approvedPreviewList || !approvedAllList) return;
       pendingList.innerHTML = pending.length
@@ -6112,6 +6658,7 @@
     function renderAll() {
       checkPredictionExpiration();
       checkGaugeBattleExpiration();
+      checkScoreboardExpiration();
       applyScreenRatioClass();
       applyScreenModeClass();
       renderParticipantGaugeBattle();
@@ -6193,6 +6740,13 @@
       startScoreboardTimer,
       pauseScoreboardTimer,
       resetScoreboardTimer,
+      resetShotClock,
+      startShotClockOnly,
+      pauseShotClockOnly,
+      adjustScoreboardStat,
+      setScoreboardPossession,
+      resetTeamBasketballStats,
+      playScoreboardBuzzer,
       showBroadcastNotice,
       showPage,
       showTicker,
