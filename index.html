@@ -4193,22 +4193,17 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, update, remove, runTransaction, increment } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBQZC_ekFU1nD0K7ERJdEhEU3xpjLBgiBI",
-      authDomain: "acts-cheer-up-booth.firebaseapp.com",
-      databaseURL: "https://acts-cheer-up-booth-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "acts-cheer-up-booth",
-      storageBucket: "acts-cheer-up-booth.firebasestorage.app",
-      messagingSenderId: "554640855463",
-      appId: "1:554640855463:web:e53ba9c69ed16f390a6682"
-    };
+    const SUPABASE_URL = "https://ntzurwcevgrowfnlnrtv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_JZFPSAzdwiZb0vRcZPJEIg_boUJX9OM";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      realtime: { params: { eventsPerSecond: 10 } }
+    });
 
-    const firebaseApp = initializeApp(firebaseConfig);
-    const realtimeDb = getDatabase(firebaseApp);
-    const FIREBASE_ROOT = "acts_cheer_up_booth_live";
+    function increment(value) {
+      return { __increment: Number(value || 0) };
+    }
 
     const STORAGE_KEY = "acts_cheer_up_booth_messages";
     const NOTICE_KEY = "acts_cheer_up_booth_notice";
@@ -4287,13 +4282,12 @@
     };
 
     let firebaseReady = false;
-    let firebaseState = { ...firebaseDefaultState };
+    let firebaseState = normalizeFirebaseState(firebaseDefaultState);
 
-    function dbPath(path = "") {
-      const cleanPath = String(path || "").replace(/^\/+|\/+$/g, "");
-      return ref(realtimeDb, cleanPath ? `${FIREBASE_ROOT}/${cleanPath}` : FIREBASE_ROOT);
+    function makeId(prefix = "id") {
+      if (crypto?.randomUUID) return crypto.randomUUID();
+      return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     }
-
 
     function scheduleRenderAll(minDelay = 80) {
       const now = Date.now();
@@ -4323,7 +4317,6 @@
       if (!battleId || !optionKey) return;
       pendingGaugeBoosts[battleId] = pendingGaugeBoosts[battleId] || {};
       pendingGaugeBoosts[battleId][optionKey] = Number(pendingGaugeBoosts[battleId][optionKey] || 0) + amount;
-
       if (gaugeBoostFlushTimer) return;
       gaugeBoostFlushTimer = setTimeout(flushGaugeBoosts, GAUGE_BOOST_FLUSH_MS);
     }
@@ -4333,7 +4326,6 @@
         clearTimeout(gaugeBoostFlushTimer);
         gaugeBoostFlushTimer = null;
       }
-
       const updates = {};
       Object.entries(pendingGaugeBoosts).forEach(([battleId, optionMap]) => {
         Object.entries(optionMap || {}).forEach(([optionKey, amount]) => {
@@ -4341,20 +4333,16 @@
           if (boostAmount > 0) updates[`gaugeBoosts/${battleId}/${optionKey}`] = increment(boostAmount);
         });
       });
-
       Object.keys(pendingGaugeBoosts).forEach(battleId => delete pendingGaugeBoosts[battleId]);
       if (!Object.keys(updates).length) return;
-
-      patchFirebase("", updates).catch(error => {
-        console.error("게이지 BOOST 일괄 저장 오류", error);
-      });
+      patchFirebase("", updates).catch(error => console.error("게이지 BOOST 일괄 저장 오류", error));
     }
 
     function arrayToFirebaseCollection(items) {
       if (!Array.isArray(items)) return items && typeof items === "object" ? items : {};
       return items.reduce((acc, item) => {
         if (!item) return acc;
-        const id = String(item.id || `item_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+        const id = String(item.id || makeId("item"));
         acc[id] = { ...item, id };
         return acc;
       }, {});
@@ -4385,6 +4373,148 @@
       }
     }
 
+    function rowToMessage(row) {
+      return {
+        id: String(row.id),
+        name: row.name || "",
+        department: row.department || "",
+        message: row.message || "",
+        status: row.status || "pending",
+        pinned: !!row.pinned,
+        createdAt: row.created_at || row.createdAt || new Date().toISOString()
+      };
+    }
+
+    function messageToRow(msg) {
+      return {
+        id: String(msg.id || makeId("message")),
+        name: msg.name || "",
+        department: msg.department || "기타",
+        message: msg.message || "",
+        status: msg.status || "pending",
+        pinned: !!msg.pinned,
+        created_at: msg.createdAt || msg.created_at || new Date().toISOString()
+      };
+    }
+
+    function rowToPrediction(row) {
+      return {
+        id: String(row.id),
+        title: row.title || "",
+        description: row.description || "",
+        options: Array.isArray(row.options) ? row.options : [],
+        status: row.status || "active",
+        endAt: row.end_at || row.endAt || null,
+        createdAt: row.created_at || row.createdAt || new Date().toISOString(),
+        votes: row.votes || {}
+      };
+    }
+
+    function predictionToRow(pred) {
+      return {
+        id: String(pred.id || makeId("prediction")),
+        title: pred.title || "",
+        description: pred.description || "",
+        options: pred.options || [],
+        votes: pred.votes || {},
+        status: pred.status || "active",
+        end_at: pred.endAt || pred.end_at || null,
+        created_at: pred.createdAt || pred.created_at || new Date().toISOString()
+      };
+    }
+
+    function rowToGaugeBattle(row) {
+      return {
+        id: String(row.id),
+        title: row.title || "ACTS-ion 게이지 배틀",
+        status: row.status || "ready",
+        options: Array.isArray(row.options) ? row.options : [],
+        endAt: row.end_at || row.endAt || null,
+        endedAt: row.ended_at || row.endedAt || null,
+        resultUntil: row.result_until || row.resultUntil || null,
+        createdAt: row.created_at || row.createdAt || new Date().toISOString()
+      };
+    }
+
+    function gaugeBattleToRow(battle) {
+      return {
+        id: String(battle.id || makeId("gauge")),
+        title: battle.title || "ACTS-ion 게이지 배틀",
+        status: battle.status || "ready",
+        options: battle.options || [],
+        counts: (firebaseState.gaugeBoosts || {})[String(battle.id)] || battle.counts || {},
+        end_at: battle.endAt || battle.end_at || null,
+        result_until: battle.resultUntil || battle.result_until || null,
+        created_at: battle.createdAt || battle.created_at || new Date().toISOString()
+      };
+    }
+
+    function rowToScreenState(row) {
+      return {
+        screen: { ratio43: !!row?.ratio43, mode: row?.mode || "live" },
+        notice: { active: !!row?.notice_active, title: row?.notice_title || "", body: row?.notice_body || "", updatedAt: row?.updated_at || "" },
+        ticker: { active: !!row?.ticker_active, text: row?.ticker_text || "", updatedAt: row?.updated_at || "" }
+      };
+    }
+
+    function rowToScoreboard(row) {
+      if (!row) return { ...DEFAULT_SCOREBOARD };
+      return {
+        ...DEFAULT_SCOREBOARD,
+        title: row.game_title || row.title || DEFAULT_SCOREBOARD.title,
+        teamAName: row.left_team || row.teamAName || DEFAULT_SCOREBOARD.teamAName,
+        teamBName: row.right_team || row.teamBName || DEFAULT_SCOREBOARD.teamBName,
+        teamAScore: Number(row.left_score ?? row.teamAScore ?? 0),
+        teamBScore: Number(row.right_score ?? row.teamBScore ?? 0),
+        period: row.quarter || row.period || "1Q",
+        timerSeconds: Number(row.game_seconds ?? row.timerSeconds ?? 600),
+        initialSeconds: Number(row.initial_seconds ?? row.initialSeconds ?? row.game_seconds ?? 600),
+        timerRunning: !!(row.game_running ?? row.timerRunning),
+        timerStartedAt: row.timer_started_at || row.timerStartedAt || null,
+        shotClockSeconds: Number(row.shot_seconds ?? row.shotClockSeconds ?? 24),
+        shotClockInitial: Number(row.shot_initial ?? row.shotClockInitial ?? 24),
+        shotClockRunning: !!(row.shot_running ?? row.shotClockRunning),
+        shotClockStartedAt: row.shot_started_at || row.shotClockStartedAt || null,
+        teamAFouls: Number(row.left_fouls ?? row.teamAFouls ?? 0),
+        teamBFouls: Number(row.right_fouls ?? row.teamBFouls ?? 0),
+        teamATimeouts: Number(row.left_timeouts ?? row.teamATimeouts ?? 5),
+        teamBTimeouts: Number(row.right_timeouts ?? row.teamBTimeouts ?? 5),
+        possession: row.possession === "right" || row.possession === "B" ? "B" : "A",
+        gameBuzzerAt: row.game_buzzer_at || row.gameBuzzerAt || "",
+        shotBuzzerAt: row.shot_buzzer_at || row.shotBuzzerAt || "",
+        updatedAt: row.updated_at || row.updatedAt || ""
+      };
+    }
+
+    function scoreboardToRow(board) {
+      return {
+        id: "main",
+        active: getScreenMode() === "scoreboard",
+        game_title: board.title || "ACTS BASKETBALL",
+        left_team: board.teamAName || "TEAM A",
+        right_team: board.teamBName || "TEAM B",
+        left_score: Number(board.teamAScore || 0),
+        right_score: Number(board.teamBScore || 0),
+        quarter: board.period || "1Q",
+        game_seconds: Number(board.timerSeconds || 0),
+        initial_seconds: Number(board.initialSeconds || 600),
+        timer_started_at: board.timerStartedAt || null,
+        shot_seconds: Number(board.shotClockSeconds ?? 24),
+        shot_initial: Number(board.shotClockInitial ?? 24),
+        shot_started_at: board.shotClockStartedAt || null,
+        game_running: !!board.timerRunning,
+        shot_running: !!board.shotClockRunning,
+        possession: board.possession === "B" ? "right" : "left",
+        left_fouls: Number(board.teamAFouls || 0),
+        right_fouls: Number(board.teamBFouls || 0),
+        left_timeouts: Number(board.teamATimeouts || 0),
+        right_timeouts: Number(board.teamBTimeouts || 0),
+        game_buzzer_at: board.gameBuzzerAt || null,
+        shot_buzzer_at: board.shotBuzzerAt || null,
+        updated_at: new Date().toISOString()
+      };
+    }
+
     function normalizeFirebaseState(data) {
       const source = data || {};
       return {
@@ -4401,25 +4531,184 @@
       };
     }
 
-    function writeFirebase(path, value) {
-      return set(dbPath(path), value).catch(error => {
-        console.error("Firebase 저장 오류", path, error);
-        alert("데이터 저장 중 문제가 발생했습니다. Firebase 규칙과 인터넷 연결을 확인해주세요.");
+    async function fetchSupabaseState() {
+      const [messagesRes, screenRes, boardRes, scoresRes, gaugeRes, predRes] = await Promise.all([
+        supabase.from("messages").select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("screen_state").select("*").eq("id", "main").maybeSingle(),
+        supabase.from("scoreboard").select("*").eq("id", "main").maybeSingle(),
+        supabase.from("game_scores").select("*").order("score", { ascending: false }).limit(300),
+        supabase.from("gauge_battle").select("*").order("created_at", { ascending: false }).limit(20),
+        supabase.from("predictions").select("*").order("created_at", { ascending: false }).limit(20)
+      ]);
+
+      const firstError = [messagesRes, screenRes, boardRes, scoresRes, gaugeRes, predRes].find(res => res.error)?.error;
+      if (firstError) throw firstError;
+
+      const screenParts = rowToScreenState(screenRes.data || {});
+      const ashiniGameScores = {};
+      (scoresRes.data || []).forEach(row => {
+        const gameKey = row.game_type || "soccer";
+        const participantId = row.device_id || row.id;
+        ashiniGameScores[gameKey] = ashiniGameScores[gameKey] || {};
+        ashiniGameScores[gameKey][participantId] = {
+          participantId,
+          gameKey,
+          name: row.name || "",
+          department: row.department || "",
+          score: Number(row.score || 0),
+          unit: gameKey === "swim" ? "m" : "점",
+          submittedAt: row.created_at || new Date().toISOString()
+        };
       });
+
+      const gaugeBoosts = {};
+      const gaugeBattles = (gaugeRes.data || []).map(row => {
+        gaugeBoosts[String(row.id)] = row.counts || {};
+        return rowToGaugeBattle(row);
+      });
+
+      const votes = {};
+      const predictions = (predRes.data || []).map(row => {
+        votes[String(row.id)] = row.votes || {};
+        return rowToPrediction(row);
+      });
+
+      firebaseState = normalizeFirebaseState({
+        messages: (messagesRes.data || []).map(rowToMessage),
+        notice: screenParts.notice,
+        screen: screenParts.screen,
+        ticker: screenParts.ticker,
+        scoreboard: rowToScoreboard(boardRes.data),
+        ashiniGameScores,
+        gaugeBattles,
+        gaugeBoosts,
+        predictions,
+        votes
+      });
+      firebaseReady = true;
     }
 
-    function patchFirebase(path, value) {
-      return update(dbPath(path), value).catch(error => {
-        console.error("Firebase 업데이트 오류", path, error);
-        alert("데이터 업데이트 중 문제가 발생했습니다. Firebase 규칙과 인터넷 연결을 확인해주세요.");
-      });
+    async function writeFirebase(path, value) {
+      try {
+        const cleanPath = String(path || "").replace(/^\/+|\/+$/g, "");
+        if (!cleanPath) {
+          const next = normalizeFirebaseState(value || {});
+          firebaseState = next;
+          await Promise.all([
+            supabase.from("messages").delete().neq("id", "__never__"),
+            supabase.from("game_scores").delete().neq("id", "__never__"),
+            supabase.from("gauge_battle").delete().neq("id", "__never__"),
+            supabase.from("predictions").delete().neq("id", "__never__")
+          ]);
+          await Promise.all([
+            next.messages.length ? supabase.from("messages").upsert(next.messages.map(messageToRow)) : Promise.resolve({}),
+            supabase.from("screen_state").upsert({ id: "main", mode: next.screen.mode || "live", ratio43: !!next.screen.ratio43, notice_title: next.notice.title || "", notice_body: next.notice.body || "", notice_active: !!next.notice.active, ticker_text: next.ticker.text || "", ticker_active: !!next.ticker.active, updated_at: new Date().toISOString() }),
+            supabase.from("scoreboard").upsert(scoreboardToRow(next.scoreboard)),
+            next.gaugeBattles.length ? supabase.from("gauge_battle").upsert(next.gaugeBattles.map(gaugeBattleToRow)) : Promise.resolve({}),
+            next.predictions.length ? supabase.from("predictions").upsert(next.predictions.map(predictionToRow)) : Promise.resolve({})
+          ]);
+          scheduleRenderAll(80);
+          return;
+        }
+
+        const parts = cleanPath.split("/");
+        if (parts[0] === "messages") {
+          if (parts.length === 1) {
+            const rows = collectionToArray(value).map(messageToRow);
+            await supabase.from("messages").delete().neq("id", "__never__");
+            if (rows.length) await supabase.from("messages").upsert(rows);
+          } else {
+            await supabase.from("messages").upsert(messageToRow(value));
+          }
+        } else if (parts[0] === "notice") {
+          await supabase.from("screen_state").upsert({ id: "main", notice_title: value.title || "", notice_body: value.body || "", notice_active: !!value.active, updated_at: value.updatedAt || new Date().toISOString() });
+        } else if (parts[0] === "ticker") {
+          await supabase.from("screen_state").upsert({ id: "main", ticker_text: value.text || "", ticker_active: !!value.active, updated_at: value.updatedAt || new Date().toISOString() });
+        } else if (parts[0] === "screen") {
+          await supabase.from("screen_state").upsert({ id: "main", [parts[1] === "ratio43" ? "ratio43" : "mode"]: value, updated_at: new Date().toISOString() });
+        } else if (parts[0] === "scoreboard") {
+          await supabase.from("scoreboard").upsert(scoreboardToRow(value));
+        } else if (parts[0] === "gaugeBattles") {
+          const rows = safeArray(value).map(gaugeBattleToRow);
+          await supabase.from("gauge_battle").delete().neq("id", "__never__");
+          if (rows.length) await supabase.from("gauge_battle").upsert(rows);
+        } else if (parts[0] === "gaugeBoosts") {
+          const battleId = parts[1];
+          const counts = parts.length >= 3 ? { ...(firebaseState.gaugeBoosts?.[battleId] || {}), [parts[2]]: value } : (value || {});
+          await supabase.from("gauge_battle").update({ counts }).eq("id", battleId);
+        } else if (parts[0] === "predictions") {
+          const rows = safeArray(value).map(predictionToRow);
+          await supabase.from("predictions").delete().neq("id", "__never__");
+          if (rows.length) await supabase.from("predictions").upsert(rows);
+        } else if (parts[0] === "votes") {
+          const predictionId = parts[1];
+          const votes = { ...(firebaseState.votes || {}) };
+          votes[predictionId] = votes[predictionId] || {};
+          votes[predictionId][parts[2]] = value;
+          firebaseState.votes = votes;
+          await supabase.from("predictions").update({ votes: votes[predictionId] }).eq("id", predictionId);
+        } else if (parts[0] === "ashiniGameScores") {
+          const gameKey = parts[1];
+          const participantId = parts[2];
+          await supabase.from("game_scores").upsert({ id: `${gameKey}_${participantId}`, game_type: gameKey, device_id: participantId, name: value.name || "", department: value.department || "", score: Number(value.score || 0), created_at: value.submittedAt || new Date().toISOString() });
+        }
+      } catch (error) {
+        console.error("Supabase 저장 오류", path, error);
+        alert("데이터 저장 중 문제가 발생했습니다. Supabase 정책과 인터넷 연결을 확인해주세요.");
+      }
     }
 
-    function removeFirebase(path) {
-      return remove(dbPath(path)).catch(error => {
-        console.error("Firebase 삭제 오류", path, error);
-        alert("데이터 삭제 중 문제가 발생했습니다. Firebase 규칙과 인터넷 연결을 확인해주세요.");
-      });
+    async function patchFirebase(path, value) {
+      try {
+        const cleanPath = String(path || "").replace(/^\/+|\/+$/g, "");
+        if (!cleanPath) {
+          for (const [keyPath, val] of Object.entries(value || {})) {
+            await patchFirebase(keyPath, val);
+          }
+          return;
+        }
+        const parts = cleanPath.split("/");
+        if (parts[0] === "messages") {
+          const id = parts[1];
+          if (parts.length === 2) await supabase.from("messages").update(value).eq("id", id);
+          if (parts.length === 3) await supabase.from("messages").update({ [parts[2]]: value }).eq("id", id);
+        } else if (parts[0] === "screen") {
+          await writeFirebase(cleanPath, value);
+        } else if (parts[0] === "scoreboard") {
+          await writeFirebase("scoreboard", { ...getScoreboard(), ...(value || {}) });
+        } else if (parts[0] === "gaugeBoosts") {
+          const battleId = parts[1];
+          const optionKey = parts[2];
+          const current = { ...(firebaseState.gaugeBoosts?.[battleId] || {}) };
+          const amount = value && typeof value === "object" && value.__increment ? Number(value.__increment) : null;
+          current[optionKey] = amount === null ? value : Number(current[optionKey] || 0) + amount;
+          firebaseState.gaugeBoosts = { ...(firebaseState.gaugeBoosts || {}), [battleId]: current };
+          await supabase.from("gauge_battle").update({ counts: current }).eq("id", battleId);
+        } else if (parts[0] === "predictions") {
+          await writeFirebase("predictions", firebaseState.predictions || []);
+        } else {
+          await writeFirebase(cleanPath, value);
+        }
+      } catch (error) {
+        console.error("Supabase 업데이트 오류", path, error);
+        alert("데이터 업데이트 중 문제가 발생했습니다. Supabase 정책과 인터넷 연결을 확인해주세요.");
+      }
+    }
+
+    async function removeFirebase(path) {
+      try {
+        const parts = String(path || "").replace(/^\/+|\/+$/g, "").split("/");
+        if (parts[0] === "messages" && parts[1]) await supabase.from("messages").delete().eq("id", parts[1]);
+        if (parts[0] === "votes" && parts[1] && parts[2]) {
+          const votes = { ...(firebaseState.votes || {}) };
+          if (votes[parts[1]]) delete votes[parts[1]][parts[2]];
+          firebaseState.votes = votes;
+          await supabase.from("predictions").update({ votes: votes[parts[1]] || {} }).eq("id", parts[1]);
+        }
+      } catch (error) {
+        console.error("Supabase 삭제 오류", path, error);
+        alert("데이터 삭제 중 문제가 발생했습니다. Supabase 정책과 인터넷 연결을 확인해주세요.");
+      }
     }
 
     function getMessages() {
@@ -6697,16 +6986,28 @@
     });
 
     function setupFirebaseRealtimeSync() {
-      onValue(dbPath(), snapshot => {
-        firebaseState = normalizeFirebaseState(snapshot.val());
-        firebaseReady = true;
-        applyScreenRatioClass();
-        updateAdminModeVisibility();
-        scheduleRenderAll(110);
-      }, error => {
-        console.error("Firebase 실시간 연결 오류", error);
-        alert("Firebase 실시간 연결에 실패했습니다. 데이터베이스 규칙과 인터넷 연결을 확인해주세요.");
-      });
+      fetchSupabaseState()
+        .then(() => {
+          applyScreenRatioClass();
+          updateAdminModeVisibility();
+          scheduleRenderAll(80);
+        })
+        .catch(error => {
+          console.error("Supabase 초기 연결 오류", error);
+          alert("Supabase 연결에 실패했습니다. 테이블/RLS 정책/API 키를 확인해주세요.");
+        });
+
+      supabase
+        .channel("acts-cheer-up-live")
+        .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, () => fetchSupabaseState().then(() => scheduleRenderAll(90)))
+        .on("postgres_changes", { event: "*", schema: "public", table: "screen_state" }, () => fetchSupabaseState().then(() => scheduleRenderAll(90)))
+        .on("postgres_changes", { event: "*", schema: "public", table: "scoreboard" }, () => fetchSupabaseState().then(() => scheduleRenderAll(90)))
+        .on("postgres_changes", { event: "*", schema: "public", table: "game_scores" }, () => fetchSupabaseState().then(() => scheduleRenderAll(120)))
+        .on("postgres_changes", { event: "*", schema: "public", table: "gauge_battle" }, () => fetchSupabaseState().then(() => scheduleRenderAll(90)))
+        .on("postgres_changes", { event: "*", schema: "public", table: "predictions" }, () => fetchSupabaseState().then(() => scheduleRenderAll(90)))
+        .subscribe(status => {
+          if (status === "CHANNEL_ERROR") console.warn("Supabase Realtime channel error");
+        });
     }
 
     function openInitialPageFromHash() {
