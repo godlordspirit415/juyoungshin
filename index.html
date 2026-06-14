@@ -284,20 +284,16 @@
 
     .sns-info {
       display: grid;
-      gap: 16px;
+      gap: 14px;
       align-content: end;
-    }
-
-    .sns-card p {
-      font-size: 15px;
-      line-height: 1.7;
-      color: rgba(0,0,0,0.58);
-      word-break: keep-all;
+      justify-items: start;
     }
 
     .sns-card strong {
       color: var(--point);
       font-weight: 900;
+      font-size: 18px;
+      line-height: 1;
     }
 
     .instagram-button {
@@ -715,26 +711,27 @@
       .sns-text {
         padding: 18px;
         justify-content: space-between;
+        min-width: 0;
       }
 
       .sns-card .section-number {
         font-size: 9px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         opacity: 0.52;
       }
 
       .sns-card h2 {
-        font-size: clamp(26px, 9vw, 42px);
-        line-height: 0.9;
+        font-size: clamp(25px, 8.4vw, 40px);
+        line-height: 0.88;
       }
 
       .sns-info {
         gap: 8px;
+        align-content: end;
       }
 
-      .sns-card p {
-        font-size: 9.5px;
-        line-height: 1.35;
+      .sns-card strong {
+        font-size: 12px;
       }
 
       .instagram-button {
@@ -953,19 +950,15 @@
         <article class="card sns-card">
           <div class="sns-text">
             <div>
-              <div class="section-number">SNS BRANDING / INSTAGRAM</div>
+              <div class="section-number">INSTAGRAM</div>
               <h2>SNS<br />관리 및<br />운영</h2>
             </div>
 
             <div class="sns-info">
-              <p>
-                아신대학교 공식 인스타그램
-                <strong>@acts_official_</strong><br />
-                브랜딩 콘텐츠 제작 및 SNS 홍보 활동 기획
-              </p>
+              <strong>@acts_official_</strong>
 
               <a class="instagram-button" href="https://www.instagram.com/acts_official_/" target="_blank" rel="noopener">
-                Instagram에서 보기
+                Instagram 보기
               </a>
             </div>
           </div>
