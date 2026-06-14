@@ -436,6 +436,146 @@
       white-space: nowrap;
     }
 
+
+    .mobile-detail-button {
+      display: none;
+      position: absolute;
+      right: 22px;
+      bottom: 20px;
+      z-index: 15;
+      border: 0;
+      border-radius: 999px;
+      background: var(--point);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 850;
+      padding: 10px 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+      cursor: pointer;
+    }
+
+    .mobile-detail-button-dark {
+      background: #111;
+      color: #fff;
+    }
+
+    .mobile-modal {
+      display: none;
+    }
+
+    .mobile-modal.is-open {
+      display: block;
+    }
+
+    .mobile-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.42);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .mobile-modal-panel {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: min(92vw, 520px);
+      max-height: 78vh;
+      transform: translate(-50%, -50%);
+      background: #f4f4f4;
+      color: #111;
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.38);
+      z-index: 101;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .mobile-modal-close {
+      position: sticky;
+      top: 0;
+      margin-left: auto;
+      display: block;
+      border: 0;
+      border-radius: 999px;
+      background: #111;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 9px 13px;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .mobile-modal-label {
+      margin-top: 8px;
+      margin-bottom: 18px;
+      font-size: 12px;
+      color: rgba(0,0,0,0.48);
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .mobile-modal-panel h2 {
+      font-size: clamp(38px, 12vw, 68px);
+      line-height: 0.92;
+      letter-spacing: -0.075em;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .mobile-modal-list {
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    .mobile-modal-list li {
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.16);
+      font-size: 15px;
+      line-height: 1.45;
+      font-weight: 700;
+      word-break: keep-all;
+    }
+
+    .mobile-modal-list span {
+      color: var(--point);
+    }
+
+    .mobile-works-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .mobile-work-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.16);
+      color: #111;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.35;
+      word-break: keep-all;
+    }
+
+    .mobile-work-item small {
+      color: var(--point);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+    }
+
+    .mobile-work-item.private {
+      opacity: 0.56;
+    }
+
     @media (max-width: 640px) {
       .swiper-slide { padding: 24px 14px; }
       .card { width: 92vw; height: calc(92vw * 9 / 16); max-height: 52vh; border-radius: 18px; }
@@ -527,6 +667,30 @@
         padding: 7px 10px;
       }
 
+
+      .mobile-detail-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .black-card .profile-list,
+      .works-card .work-scroll-wrap {
+        display: none;
+      }
+
+      .black-card {
+        display: block;
+      }
+
+      .works-card {
+        display: block;
+      }
+
+      .mobile-modal {
+        font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", sans-serif;
+      }
+
     }
   </style>
 </head>
@@ -564,6 +728,10 @@
             <li>아신대학교 총학생회 부회장 <br />(2026)</li>
             <li>아신대학교 SNS 관리자 <br />(2026)</li>
           </ul>
+
+          <button class="mobile-detail-button" type="button" data-modal-target="profileModal">
+            자세히보기
+          </button>
         </article>
       </section>
 
@@ -721,7 +889,11 @@
               <div class="custom-scrollbar-thumb" id="customScrollbarThumb"></div>
             </div>
           </div>
-        </article>
+        
+          <button class="mobile-detail-button mobile-detail-button-dark" type="button" data-modal-target="worksModal">
+            자세히보기
+          </button>
+</article>
       </section>
 
       <section class="swiper-slide">
@@ -737,6 +909,75 @@
 
     </div>
     <div class="swiper-pagination"></div>
+  </div>
+
+
+  <div class="mobile-modal" id="profileModal" aria-hidden="true">
+    <div class="mobile-modal-backdrop" data-modal-close></div>
+    <div class="mobile-modal-panel" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+      <button class="mobile-modal-close" type="button" data-modal-close>닫기</button>
+      <div class="mobile-modal-label">PROFILE / EXPERIENCE</div>
+      <h2 id="profileModalTitle">FILMMAKING<br />PHOTOGRAPHY<br />DESIGN</h2>
+      <ul class="mobile-modal-list">
+        <li>아신대학교 교육미디어커뮤니케이션 학부 재학</li>
+        <li>아신대학교 교내 방송국 <span>(2022~2024)</span></li>
+        <li>한국장학재단 인문 100년 장학생 <span>(2024~)</span></li>
+        <li>아신대학교 총학생회 부회장 <span>(2026)</span></li>
+        <li>아신대학교 SNS 관리자 <span>(2026)</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mobile-modal" id="worksModal" aria-hidden="true">
+    <div class="mobile-modal-backdrop" data-modal-close></div>
+    <div class="mobile-modal-panel works-modal-panel" role="dialog" aria-modal="true" aria-labelledby="worksModalTitle">
+      <button class="mobile-modal-close" type="button" data-modal-close>닫기</button>
+      <div class="mobile-modal-label">MORE WORKS</div>
+      <h2 id="worksModalTitle">OTHER<br />VIDEO WORKS</h2>
+
+      <div class="mobile-works-list">
+        <div class="mobile-work-item private">
+          <span>(보안상의 이유로 영상 제공 불가) | 2025년 국군포천병원 병원장 이임식 특별 영상</span>
+          <small>PRIVATE</small>
+        </div>
+        <a class="mobile-work-item" href="https://youtu.be/KgS4mtW7m9Q?si=3OcD7CDWJnzXOIcD" target="_blank" rel="noopener">
+          <span>아신대학교 49주년 개교기념 감사예배 축하영상</span>
+          <small>OPEN</small>
+        </a>
+        <a class="mobile-work-item" href="https://youtu.be/tIqk4sy5I4U?si=fcC2NVeY5qhNJwI-" target="_blank" rel="noopener">
+          <span>2024 동도교회 중등부 하계수련회 후기영상</span>
+          <small>OPEN</small>
+        </a>
+        <a class="mobile-work-item" href="https://youtu.be/a8aPIlG_IU0?si=3OdxMDaCcKoPRl7a" target="_blank" rel="noopener">
+          <span>EP.64 하나님 만난 이야기 | 황광은, 홍다은</span>
+          <small>OPEN</small>
+        </a>
+        <a class="mobile-work-item" href="https://youtu.be/kWpdeCnO9BU?si=QxOhlOKf9sKSNHsk" target="_blank" rel="noopener">
+          <span>[4K] 2024 아이스크림 청소년 여름캠프 LT 스케치영상</span>
+          <small>OPEN</small>
+        </a>
+        <a class="mobile-work-item" href="https://youtu.be/--h0q6k3OoU?si=UPQUTJUi17_vHL8Y" target="_blank" rel="noopener">
+          <span>EP.81 쉴만한 식탁 | 우리가 이곳에 모인 이유</span>
+          <small>OPEN</small>
+        </a>
+        <a class="mobile-work-item" href="https://youtu.be/RwNFn-zpU48?si=vU9AML1oxmMwwFi7" target="_blank" rel="noopener">
+          <span>주가 우리 삶 가운데 일하시네 | 아신대학교 신앙수련회 스케치 영상</span>
+          <small>OPEN</small>
+        </a>
+        <a class="mobile-work-item" href="https://www.youtube.com/watch?v=Q21hDXrjWG4" target="_blank" rel="noopener">
+          <span>[ASIN LIVE.] OFF THE RECORD | 애쓰지 않아도 괜찮아 - 권지연 (With 김은성)</span>
+          <small>OPEN</small>
+        </a>
+        <a class="mobile-work-item" href="https://www.youtube.com/watch?v=4AKVbY7ABDs" target="_blank" rel="noopener">
+          <span>2023학년도 아신대학교 졸업식</span>
+          <small>OPEN</small>
+        </a>
+        <a class="mobile-work-item" href="https://youtu.be/f4NY9SKPrgY?si=NMenry7a_adiMI3U" target="_blank" rel="noopener">
+          <span>[ASIN LIVE.] EP.2 나의 약함은 나의 자랑이요 | 안지인</span>
+          <small>OPEN</small>
+        </a>
+      </div>
+    </div>
   </div>
 
   <div class="hint">마우스 휠 또는 손가락 스와이프로 넘겨보세요</div>
@@ -865,6 +1106,38 @@
         workList.scrollTop = (targetThumbTop / maxThumbTop) * maxScrollTop;
       });
     }
+
+    document.querySelectorAll("[data-modal-target]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const targetId = button.getAttribute("data-modal-target");
+        const modal = document.getElementById(targetId);
+        if (!modal) return;
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      });
+    });
+
+    document.querySelectorAll("[data-modal-close]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".mobile-modal.is-open").forEach((modal) => {
+          modal.classList.remove("is-open");
+          modal.setAttribute("aria-hidden", "true");
+        });
+        document.body.style.overflow = "";
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      document.querySelectorAll(".mobile-modal.is-open").forEach((modal) => {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+      });
+      document.body.style.overflow = "";
+    });
+
   </script>
 </body>
 </html>
