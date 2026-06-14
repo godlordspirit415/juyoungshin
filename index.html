@@ -438,7 +438,7 @@
 
     @media (max-width: 640px) {
       .swiper-slide { padding: 24px 14px; }
-      .card { width: 92vw; height: 64vh; border-radius: 18px; }
+      .card { width: 92vw; height: calc(92vw * 9 / 16); max-height: 52vh; border-radius: 18px; }
       .intro-card, .sns-card { grid-template-columns: 1fr; }
       .profile-area, .sns-image {
         position: absolute;
@@ -459,9 +459,74 @@
       .black-card, .works-card { grid-template-columns: 1fr; }
       .black-card, .works-card, .contact-card { padding: 26px; }
       .profile-list { font-size: 13px; gap: 8px; }
-      .works-card { height: 72vh; }
+      .works-card { height: calc(92vw * 9 / 16); max-height: 52vh; }
       .work-scroll-wrap { max-height: 42vh; } .work-list { max-height: 42vh; padding-right: 8px; }
-      .mini-label { margin-bottom: 42px; }
+      .mini-label { margin-bottom: 22px; }
+
+      .intro-title h1 {
+        font-size: clamp(30px, 11vw, 54px);
+      }
+
+      .intro-desc {
+        font-size: 12px;
+        margin-top: 14px;
+      }
+
+      .number {
+        font-size: clamp(58px, 18vw, 96px);
+        right: 18px;
+        bottom: 14px;
+      }
+
+      .project-title,
+      .sns-card h2,
+      .works-card h2,
+      .contact-card h2 {
+        font-size: clamp(28px, 10vw, 52px);
+      }
+
+      .profile-list {
+        font-size: 11px;
+        line-height: 1.25;
+        gap: 5px;
+      }
+
+      .profile-list li {
+        padding-bottom: 5px;
+      }
+
+      .video-overlay {
+        padding: 72px 20px 18px;
+      }
+
+      .video-overlay h2 {
+        font-size: clamp(26px, 10vw, 48px);
+      }
+
+      .video-overlay p,
+      .sns-card p,
+      .contact-info {
+        font-size: 12px;
+      }
+
+      .work-link {
+        font-size: 10.5px;
+        padding: 6px 0;
+      }
+
+      .play-button {
+        width: 58px;
+        height: 58px;
+        font-size: 23px;
+      }
+
+      .youtube-link {
+        right: 14px;
+        top: 12px;
+        font-size: 10px;
+        padding: 7px 10px;
+      }
+
     }
   </style>
 </head>
